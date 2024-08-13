@@ -37,15 +37,7 @@ model DmList{
   id              String        @id @default(uuid())
   userName        String            
   profileId       String
+  chats           String[]      @default([])
   profile         Profile       @relation(fields: [profileId] , references: [id])
-  chats           Chats[]
 }
 
-
-model Chats{
-  id              String        @id @default(uuid())
-  message         String  
-  dateTime        DateTime      @default(now())
-  dmId            String
-  dmList          DmList       @relation(fields: [dmId] , references: [id])
-}

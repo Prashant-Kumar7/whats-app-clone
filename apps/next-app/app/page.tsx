@@ -24,11 +24,11 @@ export default async function ProfileList(){
           <div className="p-6 bg-red-400">
               <span className="text-3xl">Profile List</span>
           </div>
-          {users.map((user : UserType , index)=>{
+          {users.map((user : any , index)=>{
             return(
               <UserList
               key={index}
-              username={user.email}
+              username={user.username}
               />
             )
           })}

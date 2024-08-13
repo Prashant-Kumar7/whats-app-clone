@@ -38,12 +38,20 @@ export const NEXT_AUTH_CONFIG = {
                 }
               })
 
+              const profile = await prisma.profile.findUnique({
+                where : {
+                  userId : user?.id
+                }
+              })
+
   
               if (user && await compare(credentials.password, user.password)){
                 return {
                   id: user.id,
                   email: user.email,
-                  password : user.password
+                  profileId : profile?.username,
+                  password : user.password,
+
                 };
               } else {
                 console.log("error msg user doesnot exist")
@@ -80,9 +88,16 @@ export const NEXT_AUTH_CONFIG = {
             }
           })
 
+          const profile = await prisma.profile.findUnique({
+            where : {
+              userId : user?.id
+            }
+          })
+
           
           if (session.user) {
             session.user.id = user?.id
+            session.user.profileId = profile?.id
           }
 
         
