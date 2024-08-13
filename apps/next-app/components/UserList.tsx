@@ -9,9 +9,11 @@ export interface ProfileListType {
 
 export const UserList = ({username} : ProfileListType)=>{
 
+
     //this handler needs to be tested
     function handleClick(){
-        axios.post("/api/DmList" , {username : username})
+        // axios.post("/api/DmList" , {username : username})
+
     }
 
     return (

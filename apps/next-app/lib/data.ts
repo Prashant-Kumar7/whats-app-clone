@@ -15,3 +15,14 @@ export async function fetchLoggedinProfile(userId :string) {
 
     return profile
 }
+
+export async function fetchDmList(username:string , profileId: string) {
+    const DmList = await prisma.dmList.findMany({
+        where : {
+            userName : username,
+            profileId : profileId
+        }
+    })
+
+    return DmList;
+}
