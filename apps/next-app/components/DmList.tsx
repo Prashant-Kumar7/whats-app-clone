@@ -23,9 +23,10 @@ export const DmList = ({setSelectedChat , chatList} : SelectedChatType )=>{
             <div className="border-b border-slate-700 p-6">
                 <span className="text-3xl">Chats</span>
             </div>
-            {chatsList.map((chats)=>{
+            {chatsList.map((chats, index)=>{
                 return (
                     <Chats
+                    key={index}
                     name={chats.name}
                     setChat = {setSelectedChat}
                     />

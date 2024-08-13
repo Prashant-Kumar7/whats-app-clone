@@ -24,11 +24,11 @@ model User {
 
 model Profile {
   id              String    @id @default(uuid())
-  name            String
+  name            String?
   username        String    @unique
   userId          String    @unique
   user            User      @relation(fields: [userId] , references: [id])
-  profilePic      String
+  profilePic      String    @default("https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg")
   chatList        DmList[]
 }
 
