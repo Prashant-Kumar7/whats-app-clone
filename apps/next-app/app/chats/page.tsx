@@ -29,8 +29,6 @@ export default async function MainChats(){
     })
   })
 
-  console.log(tempArray)
-
   // var tempArray = []
 
   // if(chatList){
