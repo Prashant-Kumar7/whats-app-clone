@@ -3,16 +3,19 @@
 import axios from "axios"
 
 export interface ProfileListType {
+    profileId : string
     username : string
 }
 
 
-export const UserList = ({username} : ProfileListType)=>{
+export const UserList = ({username, profileId} : ProfileListType)=>{
 
 
     //this handler needs to be tested
     function handleClick(){
-        // axios.post("/api/DmList" , {username : username})
+        axios.post("/api/DmList" , {profileId : profileId}).then(()=>{
+            alert(`${username} added to DM`)
+        })
 
     }
 

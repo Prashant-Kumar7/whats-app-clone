@@ -1,25 +1,31 @@
 "use client"
 
+import { currentChatAtom } from "@/state"
+import { useSetRecoilState } from "recoil"
+
 interface Chats {
-    name : string | undefined
-    setChat : Function
+    username : string
+    profilePic : string
+    profileId : string
+    chats : any
 }
 
-export const Chats = ({name, setChat} : Chats)=>{
+export const Chats = ({username , profilePic, profileId, chats} : Chats)=>{
 
+    const setCurrentChat = useSetRecoilState<Chats>(currentChatAtom);
     function handleClick(){
-        setChat((p: any)=>{
-            return {
-                ...p,
-                name : name
-            }
+        setCurrentChat({
+            username : username,
+            profileId : profileId,
+            profilePic : profilePic,
+            chats : chats
         })
     }
 
     return (
         <div onClick={handleClick} className="p-6 flex border-b gap-4 border-slate-700">
-                <img className="rounded-full w-8 h-8" src="https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg" alt="" />
-            <span>{name}</span>
+                <img className="rounded-full w-8 h-8" src={profilePic} alt="" />
+            <span>{username}</span>
         </div>
     )
 }

@@ -1,7 +1,7 @@
 import { Appbar } from "@/components/Appbar"
 import { UserList } from "@/components/UserList"
 import { NEXT_AUTH_CONFIG } from "@/lib/auth"
-import { fetchUsers } from "@/lib/data"
+import { fetchAllProfiles } from "@/lib/data"
 import { getServerSession } from "next-auth"
 
 export interface UserType {
@@ -16,7 +16,7 @@ export default async function ProfileList(){
 
   const session = await getServerSession(NEXT_AUTH_CONFIG)
   
-  const users =  await fetchUsers();
+  const users =  await fetchAllProfiles();
 
   return (
       <div style={{height: "100vh"}} className=" w-screen flex flex-col gap-4 p-6">
@@ -29,6 +29,7 @@ export default async function ProfileList(){
               <UserList
               key={index}
               username={user.username}
+              profileId={user.id}
               />
             )
           })}

@@ -6,16 +6,16 @@ import { NextRequest, NextResponse } from "next/server"
 export const GET = async()=>{
 
     const session = await getServerSession(NEXT_AUTH_CONFIG);
-
-    const DmList = prisma.dmList.findMany({
+    const DmList = await prisma.profile.findUnique({
         where : {
-            userName : session.user.profileId
+            id : session.user.profileId
+        },
+        select : {
+            DmList : true
         }
     })
 
-    return NextResponse.json({
-        DmList : DmList
-    })
+    return NextResponse.json(DmList)
 }
 
 
@@ -26,7 +26,7 @@ export const POST = async(req: NextRequest)=>{
     const session = await getServerSession(NEXT_AUTH_CONFIG);
     const user = await prisma.profile.findUnique({
         where : {
-            username : body.username
+            id : session.user.profileId
         }
     })
 
@@ -36,12 +36,17 @@ export const POST = async(req: NextRequest)=>{
         })
     }
 
-    await prisma.dmList.create({
+
+    const updateDmList = await prisma.profile.update({
         data : {
-            userName : body.username,
-            profileId : session.user.profileId
+            DmList : [...user.DmList, body.profileId]
+        },
+        where : {
+            id : session.user.profileId
         }
     })
+
+    
 
     return NextResponse.json({
         msg : "success"
@@ -49,25 +54,25 @@ export const POST = async(req: NextRequest)=>{
 }
 
 
-export const DELETE = async(req: NextRequest)=>{
-    const session = await getServerSession(NEXT_AUTH_CONFIG);
-    const body = await req.json()
+// export const DELETE = async(req: NextRequest)=>{
+//     const session = await getServerSession(NEXT_AUTH_CONFIG);
+//     const body = await req.json()
 
-    // const dm = await prisma.dmList.findMany({
-    //     where : {
-    //         userName : body.username,
-    //         profileId : session.user.profileId
-    //     }
-    // })
+//     // const dm = await prisma.dmList.findMany({
+//     //     where : {
+//     //         userName : body.username,
+//     //         profileId : session.user.profileId
+//     //     }
+//     // })
 
-    await prisma.dmList.deleteMany({
-        where : {
-            userName : body.username,
-            profileId : session.user.profileId
-        },
-    })
+//     await prisma.dmList.deleteMany({
+//         where : {
+//             userName : body.username,
+//             profileId : session.user.profileId
+//         },
+//     })
 
-    return NextResponse.json({
-        delete_DM : "success"
-    })
-}
+//     return NextResponse.json({
+//         delete_DM : "success"
+//     })
+// }

@@ -29,15 +29,8 @@ model Profile {
   userId          String    @unique
   user            User      @relation(fields: [userId] , references: [id])
   profilePic      String    @default("https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg")
-  chatList        DmList[]
+  DmList          String[]
 }
 
 
-model DmList{
-  id              String        @id @default(uuid())
-  userName        String            
-  profileId       String
-  chats           String[]      @default([])
-  profile         Profile       @relation(fields: [profileId] , references: [id])
-}
 

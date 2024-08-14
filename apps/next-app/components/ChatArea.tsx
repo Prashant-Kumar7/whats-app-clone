@@ -1,20 +1,33 @@
+"use client"
+
+import { currentChatAtom } from "@/state"
+import { useRecoilValue } from "recoil"
+import { MessageTemplate } from "./MessageTemplate"
+
 export interface ChatArea {
     name : string | undefined
 }
 
-export const ChatArea = ({name} : ChatArea)=>{
+export const ChatArea = ()=>{
+
+
+    const currentChat = useRecoilValue(currentChatAtom)
+
     return (
         <div style={{height: "100%" , width: "100%"}} className='grid grid-rows-12 col-span-6 bg-slate-900 rounded-r-sm'>
             {/* {chat header} */}
             <div className="p-2 pl-4 row-span-1 flex border-b items-center border-gray-700">
-                <img className="rounded-full w-11 h-11 mr-8" src="https://t4.ftcdn.net/jpg/02/15/84/43/240_F_215844325_ttX9YiIIyeaR7Ne6EaLLjMAmy4GvPC69.jpg" alt="" />
+                <img className="rounded-full w-11 h-11 mr-8" src={currentChat.profilePic} alt="" />
                 <div>
-                    <span className="text-xl text-gray-200">{name}</span>
+                    <span className="text-xl text-gray-200">{currentChat.username}</span>
                 </div>
             </div>
             {/* {message area} */}
-            <div  className="row-span-10 bg-slate-900">
+            <div  className="row-span-10 bg-slate-900 flex gap-4 flex-col p-4">
 
+                {currentChat.chats.map((msg)=>{
+                    return <MessageTemplate/>
+                })}
             </div>
 
             {/* {input field} */}
