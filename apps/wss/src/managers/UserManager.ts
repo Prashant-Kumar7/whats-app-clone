@@ -9,6 +9,8 @@ export interface PendingUser {
     name : string
 }
 
+const clients = new Map()
+
 
 export class UserManager {
     private rooms : RoomManger[]
@@ -23,9 +25,15 @@ export class UserManager {
         // this.roomManager = new RoomManager();
     }
 
-    addUser(socket: WebSocket) {
+    addUser(socket: WebSocket , wss : any) {
         this.users.push(socket)
+        const id = this.uuidv4();
+        const users = wss.clients
+        const metadata = {users}
+        clients.set(wss , metadata)
+
         this.addHandler(socket)
+        // this.addHandler(socket)
     }
 
 
@@ -33,30 +41,25 @@ export class UserManager {
         this.users = this.users.filter(user => user !== socket)
     }
 
+    private uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+    }
 
     private addHandler(socket: WebSocket){
         socket.on('message', (data)=>{
             
             const message = JSON.parse(data.toString())
             
-            //when users ask to get them connected to others
+            //when user wants to let know the wss that they are online
 
             if (message.type === "init_conn"){
-
-                if(this.pendingUser){
-                    const room = new RoomManger(this.pendingUser, socket)
-                    room.user2Name = message.name
-                    room.user1Name = this.pendingUser.name
-                    this.rooms.push(room)
-                    room.gotConnected(socket, this.pendingUser)
-                    this.pendingUser = null
-
-                }else {
-                    this.pendingUser = {
-                        socket : socket,
-                        name : message.name
-                    }
-                }
+                console.log(message.master)
+                console.log(message.slave.map((id : any)=>{
+                    return id
+                }))
             }
 
 

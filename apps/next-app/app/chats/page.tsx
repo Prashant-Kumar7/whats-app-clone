@@ -29,13 +29,7 @@ export default async function MainChats(){
     })
   })
 
-  // var tempArray = []
 
-  // if(chatList){
-  //   tempArray = chatList.
-  // }
-  // const chatList  :any = []
-// const [selectedChat , setSelectedChat] = useState<ChatArea>()
 
 
   return (
