@@ -1,5 +1,4 @@
-// import { Socket } from "socket.io";
-// import { RoomManager } from "./RoomManager";
+
 
 import { WebSocket } from "ws";
 import { RoomManger } from "./RoomManager";
@@ -14,17 +13,14 @@ const clients = new Map()
 
 export class UserManager {
     private onlineIds : string[]
-    // private roomManager: RoomManager;
     
     constructor() {
         this.onlineIds = [];
-        // this.roomManager = new RoomManager();
     }
 
     addUser(socket: WebSocket) {
 
         this.addHandler(socket)
-        // this.addHandler(socket)
     }
 
 
@@ -42,7 +38,6 @@ export class UserManager {
             const message = JSON.parse(data.toString())
         
             if(message.type === "init_conn"){
-              // const id = uuidv4();
               const profileId = message.profileId 
               const metadata = { profileId }
               clients.set(socket , metadata)
@@ -76,7 +71,6 @@ export class UserManager {
             }
         
             if(message.type === "Message"){
-              // users.sendMessage(pro)
               clients.forEach((value, key)=>{
                 const metadata = clients.get(key)
                 if(message.receiverId === metadata.profileId){

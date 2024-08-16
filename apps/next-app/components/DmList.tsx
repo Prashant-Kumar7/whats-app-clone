@@ -14,7 +14,6 @@ import { dmListAtom, onlineIdsAtom } from "@/state";
 export const DmList = ({chatList , loggedInUserSession} : any )=>{
 
     const [socket, setSocket] = useState<WebSocket | null>(null);
-    // const [online, setOnline] = useState(false)
     const [DmList ,setDmList] = useRecoilState(dmListAtom);
     const [onlineIds, setOnlineIds] = useRecoilState(onlineIdsAtom)
 
@@ -50,7 +49,6 @@ export const DmList = ({chatList , loggedInUserSession} : any )=>{
         startConnection()
 
         return () =>{
-            // console.log("DmList unmounted")
             const close_conn = {
                 type : "close_conn"
             }
@@ -59,23 +57,10 @@ export const DmList = ({chatList , loggedInUserSession} : any )=>{
         };
     }, [])
 
-
-    // window.addEventListener("unload", function () {
-    //     const close_conn = {
-    //         type : "close_conn"
-    //     }
-
-    //     if(socket){
-    //         if(socket.readyState == WebSocket.OPEN)
-    //             socket.send(JSON.stringify(close_conn))
-    //     }
-    // });
-
     if(socket){
         socket.onmessage = (message) => {
             const res = JSON.parse(message.data)
             if(res.profileId === loggedInUserSession.user.profileId){
-                // console.log('Message received: ', res.onlineIds);
                 setOnlineIds(res.onlineIds)
             }
         }
@@ -103,7 +88,6 @@ export const DmList = ({chatList , loggedInUserSession} : any )=>{
                     profileId={chat.id}
                     chats={[]}
                     status = {status}
-                    // setChat = {setSelectedChat}
                     />
                 )
             })}
