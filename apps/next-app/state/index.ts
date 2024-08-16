@@ -11,6 +11,12 @@ export const currentChatAtom = atom({
         username : "",
         profilePic : "",
         chats : [],
-        profileId : ""
+        profileId : "",
+        status : ""
     }
+})
+
+export const onlineIdsAtom = atom({
+    key : "onlineIdsAtom",
+    default : []
 })

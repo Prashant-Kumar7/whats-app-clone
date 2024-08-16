@@ -9,48 +9,11 @@ const wss = new WebSocketServer({ server: httpServer });
 
 
 const users = new UserManager()
-const clients = new Map()
+// const clients = new Map()
 wss.on('connection', function connection(ws) {
 
-  ws.on('message' , (data)=>{
-    const message = JSON.parse(data.toString())
-
-    if(message.type === "init_conn"){
-      // const id = uuidv4();
-      const profileId = message.profileId 
-      const metadata = { profileId }
-      clients.set(ws , metadata)
-
-      ws.send("connected")
-    }
-
-    if(message.type === "getUsersStatus"){
-      var onlineId : string[] = []
-      clients.forEach((value , key)=>{
-        const metadata = clients.get(key)
-        onlineId.push(metadata.profileId)
-      })
-      ws.send(JSON.stringify(onlineId))
-    }
-
-    if(message.type === "close_conn"){
-      clients.delete(ws)
-      ws.close()
-    }
-
-    if(message.type === "Message"){
-      // users.sendMessage(pro)
-      clients.forEach((value, key)=>{
-        const metadata = clients.get(key)
-        if(message.receiverId === metadata.profileId){
-          key.send(message.msg)
-        }
-      })
-    }
-
-
-  })
-  // users.addUser(ws, wss)
+  users.addUser(ws)
+  // users  .addUser(ws, wss)
 
   // ws.send(`Hello! Message From Server!!`);
 });
