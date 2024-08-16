@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { Chats } from "./Chats";
-import { ChatArea } from "./ChatArea";
 import { SingleProfileType } from "@/app/chats/page";
 import { useRecoilState } from "recoil";
 import { dmListAtom, onlineIdsAtom } from "@/state";
@@ -56,6 +55,9 @@ export const DmList = ({chatList , loggedInUserSession} : any )=>{
             socket?.send(JSON.stringify(close_conn))
         };
     }, [])
+
+
+    
 
     if(socket){
         socket.onmessage = (message) => {

@@ -1,6 +1,6 @@
 "use client"
 
-import { currentChatAtom } from "@/state"
+import { currentChatAtom, onlineIdsAtom } from "@/state"
 import { useRecoilValue } from "recoil"
 import { MessageTemplate } from "./MessageTemplate"
 
@@ -12,14 +12,21 @@ export const ChatArea = ()=>{
 
 
     const currentChat = useRecoilValue(currentChatAtom)
-
+    const onlineIds = useRecoilValue(onlineIdsAtom)
+    const status = onlineIds.find((id)=>{
+        if(id === currentChat.profileId){
+            return true
+        }
+        return false
+    })
     return (
         <div style={{height: "100%" , width: "100%"}} className='grid grid-rows-12 col-span-6 bg-slate-900 rounded-r-sm'>
             {/* {chat header} */}
             <div className="p-2 pl-4 row-span-1 flex border-b items-center border-gray-700">
                 <img className="rounded-full w-11 h-11 mr-8" src={currentChat.profilePic} alt="" />
-                <div>
-                    <span className="text-xl text-gray-200">{currentChat.username}</span>
+                <div className="flex flex-col">
+                    <span className="text-md text-gray-200">{currentChat.username}</span>
+                    {status? <span className="text-green-500 text-sm">online</span> : <span className="text-gray-500 text-sm">offline</span> }
                 </div>
             </div>
             {/* {message area} */}

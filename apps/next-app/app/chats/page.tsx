@@ -33,7 +33,7 @@ export default async function MainChats(){
 
 
   return (
-    <div className='grid grid-cols-9 h-screen w-screen p-6'>
+    <div className='grid grid-cols-9 h-screen w-screen p-4'>
       <DmList chatList={tempArray} loggedInUserSession ={session}/>
       <ChatArea/>
     </div>

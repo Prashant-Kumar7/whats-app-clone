@@ -1,6 +1,7 @@
 "use client"
 
 import { currentChatAtom } from "@/state"
+import { useEffect, useState } from "react"
 import { useSetRecoilState } from "recoil"
 
 interface Chats {
@@ -14,23 +15,26 @@ interface Chats {
 export const Chats = ({username , profilePic, profileId, chats, status} : Chats)=>{
 
     const setCurrentChat = useSetRecoilState<Chats>(currentChatAtom);
+
     function handleClick(){
-        // setCurrentChat({
-        //     username : username,
-        //     profileId : profileId,
-        //     profilePic : profilePic,
-        //     chats : chats,
-        //     status : status
-        // })
+        setCurrentChat({
+            username : username,
+            profileId : profileId,
+            profilePic : profilePic,
+            chats : chats,
+            status : status
+        })
     }
 
     return (
-        <div onClick={handleClick} className="p-6 flex border-b gap-4 border-slate-700">
-            <img className="rounded-full w-8 h-8" src={profilePic} alt="" />
+        <div onClick={handleClick} className="p-4 flex border-b gap-4 border-slate-700">
+            {status ? <div style={{height : "0.66rem" , width : "0.66rem" , marginLeft : "-10px"}} className="rounded-full bg-green-600 relative left-14 top-7"></div> : <div></div> }
+            
+            <img className="rounded-full w-10 h-10" src={profilePic} alt="" />
+
             <div className="flex flex-col">
                 <span>{username}</span>
-                {status? <span>online</span> : <span>offline</span>}
-                {/* <span>{status}</span> */}
+                {/* {status? <span className="text-green-500 text-sm">online</span> : <span className="text-gray-500 text-sm">offline</span>} */}
             </div>
         </div>
     )
