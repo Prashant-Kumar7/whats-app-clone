@@ -34,7 +34,7 @@ export const Chats = ({username , profilePic, profileId, chats, status} : Chats)
 
             <div className="flex flex-col">
                 <span>{username}</span>
-                {/* {status? <span className="text-green-500 text-sm">online</span> : <span className="text-gray-500 text-sm">offline</span>} */}
+                {status? <span className="text-green-500 text-sm">online</span> : <span className="text-gray-500 text-sm">offline</span>}
             </div>
         </div>
     )

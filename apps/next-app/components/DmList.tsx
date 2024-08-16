@@ -3,70 +3,24 @@
 import { useEffect, useState } from "react"
 import { Chats } from "./Chats";
 import { SingleProfileType } from "@/app/chats/page";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { dmListAtom, onlineIdsAtom } from "@/state";
 
 
 
 
 
-export const DmList = ({chatList , loggedInUserSession} : any )=>{
+export const DmList = ({chatList , loggedInUserSession , ws} : any )=>{
 
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const [DmList ,setDmList] = useRecoilState(dmListAtom);
-    const [onlineIds, setOnlineIds] = useRecoilState(onlineIdsAtom)
-
-    var timer : any
-
-    
-    function startConnection(){
-        const newSocket = new WebSocket('ws://localhost:8080');
-        newSocket.onopen = () => {
-            const init_conn = {
-                type : "init_conn",
-                profileId : loggedInUserSession.user.profileId
-            }
-            newSocket.send(JSON.stringify(init_conn));
-
-          
-            const getUsersStatus = {
-                type : "getUsersStatus"
-            }
-            timer = setInterval(()=>{
-                newSocket.send(JSON.stringify(getUsersStatus));
-            }, 2000)
-
-        }
-        
-        setSocket(newSocket);
-
-    }
-
+    const onlineIds = useRecoilValue(onlineIdsAtom)
 
     useEffect(() => {
         setDmList(chatList)
-        startConnection()
-
-        return () =>{
-            const close_conn = {
-                type : "close_conn"
-            }
-            clearInterval(timer)
-            socket?.send(JSON.stringify(close_conn))
-        };
+        setSocket(ws)
     }, [])
 
-
-    
-
-    if(socket){
-        socket.onmessage = (message) => {
-            const res = JSON.parse(message.data)
-            if(res.profileId === loggedInUserSession.user.profileId){
-                setOnlineIds(res.onlineIds)
-            }
-        }
-    }
 
     return (
         <div className='flex flex-col col-span-3 bg-slate-900 border-r border-gray-600 rounded-l-sm'>

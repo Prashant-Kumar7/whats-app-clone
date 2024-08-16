@@ -6,6 +6,7 @@ import { ChatArea } from '../../components/ChatArea'
 import { fetchAllProfiles, fetchDmList } from '@/lib/data'
 import { getServerSession } from 'next-auth'
 import { NEXT_AUTH_CONFIG } from '@/lib/auth'
+import { ChatPage } from '@/components/ChatPage'
 
 export interface SingleProfileType {
     id: string;
@@ -33,9 +34,6 @@ export default async function MainChats(){
 
 
   return (
-    <div className='grid grid-cols-9 h-screen w-screen p-4'>
-      <DmList chatList={tempArray} loggedInUserSession ={session}/>
-      <ChatArea/>
-    </div>
+    <ChatPage chatList={tempArray} loggedInUserSession = {session}/>
   )
 }

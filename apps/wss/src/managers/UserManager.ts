@@ -59,7 +59,7 @@ export class UserManager {
                 }
               })
               const metadata = clients.get(socket)
-              const resData = { profileId : metadata.profileId , onlineIds : this.onlineIds}
+              const resData = {type : "getUsersStatus", profileId : metadata.profileId , onlineIds : this.onlineIds}
               socket.send(JSON.stringify(resData))
             }
         
