@@ -9,8 +9,23 @@ export interface ChatArea {
     name : string | undefined
 }
 
-export const ChatArea = ({ws} :any)=>{
+interface ChatAreaPropsType {
+    receiveMessageFn :any
+    tempChats : MessageType[]
+}
 
+
+export interface MessageType {
+    type : string
+    toProfileId : string
+    data : string
+    fromProfileId : string
+}
+
+export const ChatArea = ({receiveMessageFn, tempChats ,sendMessageFn ,loggedInUserSession} :any)=>{
+
+
+    const [chats , setChats] = useState<MessageType[]>([])
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const currentChat = useRecoilValue(currentChatAtom)
     const onlineIds = useRecoilValue(onlineIdsAtom)
@@ -21,11 +36,13 @@ export const ChatArea = ({ws} :any)=>{
         }
         return false
     })
-    
 
     useEffect(()=>{
-        setSocket(ws)
-    },[])
+        setChats((prevChats)=>{
+            return [...prevChats, tempChats]
+        })
+    }, [tempChats])
+    // receiveMessageFn(setChats)
 
 
     function handleChange(e: any){
@@ -33,8 +50,21 @@ export const ChatArea = ({ws} :any)=>{
     }
 
     function handleSend(){
+
+        const data = {
+            type : "Message",
+            data : input,
+            toProfileId : currentChat.profileId,
+            fromProfileId : loggedInUserSession.user.profileId
+        }
+
+        sendMessageFn(data , setChats)
+        
         setInput("");
     }
+
+    
+
 
     return (
         <div style={{height: "100%" , width: "100%"}} className='grid grid-rows-12 col-span-6 bg-slate-900 rounded-r-sm'>
@@ -49,8 +79,13 @@ export const ChatArea = ({ws} :any)=>{
             {/* {message area} */}
             <div  className="row-span-10 bg-slate-900 flex gap-4 flex-col p-4">
 
-                {currentChat.chats.map((msg)=>{
-                    return <MessageTemplate/>
+                {chats.map((msg : MessageType)=>{
+                    return <MessageTemplate
+                    data={msg.data}
+                    toProfileId={msg.toProfileId}
+                    fromProfileId={msg.fromProfileId}
+                    loggedInProfileId={loggedInUserSession.user.profileId}
+                    />
                 })}
             </div>
 

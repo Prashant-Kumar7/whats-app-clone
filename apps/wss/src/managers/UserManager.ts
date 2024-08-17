@@ -24,15 +24,6 @@ export class UserManager {
     }
 
 
-    
-
-    private uuidv4() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
-        });
-    }
-
     private addHandler(socket: WebSocket){
         socket.on('message' , (data)=>{
             const message = JSON.parse(data.toString())
@@ -73,8 +64,16 @@ export class UserManager {
             if(message.type === "Message"){
               clients.forEach((value, key)=>{
                 const metadata = clients.get(key)
-                if(message.receiverId === metadata.profileId){
-                  key.send(message.msg)
+                if(message.toProfileId === metadata.profileId){
+
+                  const res = {
+                    type : "Message",
+                    toProfileId : message.toProfileId,
+                    data : message.data,
+                    fromProfileId : message.profileId
+                  }
+
+                  key.send(JSON.stringify(res))
                 }
               })
             }
