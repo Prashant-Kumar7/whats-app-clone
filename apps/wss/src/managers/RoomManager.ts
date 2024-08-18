@@ -1,70 +1,82 @@
 import { WebSocket } from "ws";
 import { PendingUser } from "./UserManager";
 
-interface MsgObj {
-    msg : string
-    person : string
+interface MsgObjType {
+    type : string
+    data : string
+    toProfileId : string
+    fromProfileId : string
 }
 
 
 export class RoomManger {
 
-    public user1 : PendingUser;
+    public user1 : WebSocket
     public user2 : WebSocket;
-    private msgArray : MsgObj[];
-    public user1Name : string
-    public user2Name : string
+    private msgArray : any[];
+    public user1Id : string
+    public user2Id : string
 
-    constructor (user1: PendingUser, user2:WebSocket){
+    constructor (user1: WebSocket, user2:WebSocket){
         this.user1 = user1
         this.user2 = user2
         this.msgArray = []
-        this.user1Name = user1.name
-        this.user2Name = ""
+        this.user1Id = ""
+        this.user2Id = ""
     }
 
     // msg: { sender: WebSocket; message: string; }
 
-    sendMessages(socket: WebSocket, msg : string){
-        const msgObj = {
-            type : "message",
-            msg : msg,
-            person : "other"
-        }
+    sendMessages(socket: WebSocket, message : MsgObjType){
+        console.log("inside room Manager")
+        if(socket === this.user1){
 
-        if(socket === this.user1.socket){
-            this.user2.send(JSON.stringify(msgObj))
-            this.msgArray.push(msgObj)
+            const res = {
+                type : message.type,
+                toProfileId : this.user2Id,
+                data : message.data,
+                fromProfileId : this.user1Id
+            }
+
+            this.user2.send(JSON.stringify(res))
+            // this.msgArray.push(msgObj)
 
         } else {
-            this.user1.socket.send(JSON.stringify(msgObj))
-            this.msgArray.push(msgObj)
+            const res = {
+                type : message.type,
+                toProfileId : this.user1Id,
+                data : message.data,
+                fromProfileId : this.user2Id
+            }
+
+            this.user1.send(JSON.stringify(res))
+            // this.msgArray.push(msgObj)
         }
     }
 
 
-    typingState(socket: WebSocket){
-        if(socket === this.user1.socket){
-            this.user2.send(JSON.stringify({type : "typing"}))
-        } else {
-            this.user1.socket.send(JSON.stringify({type : "typing"}))
-        }
-    }
+    // typingState(socket: WebSocket){
+    //     if(socket === this.user1.socket){
+    //         this.user2.send(JSON.stringify({type : "typing"}))
+    //     } else {
+    //         this.user1.socket.send(JSON.stringify({type : "typing"}))
+    //     }
+    // }
 
 
-    CloseConn(socket: WebSocket){
-        if(this.user1.socket === socket){
-            this.user2.send(JSON.stringify({msg : `${this.user1Name} left the chat`, person : "other" , type : "close_conn"}))
-        } else if(this.user2 === socket){
-            this.user1.socket.send(JSON.stringify({msg : `${this.user2Name} left the chat`, person : "other", type : "close_conn"}))
-        }
-        this.user1.socket.close()
-        this.user2.close()
-    }
+    // CloseConn(socket: WebSocket){
+    //     if(this.user1.socket === socket){
+    //         this.user2.send(JSON.stringify({msg : `${this.user1Name} left the chat`, person : "other" , type : "close_conn"}))
+    //     } else if(this.user2 === socket){
+    //         this.user1.socket.send(JSON.stringify({msg : `${this.user2Name} left the chat`, person : "other", type : "close_conn"}))
+    //     }
+    //     this.user1.socket.close()
+    //     this.user2.close()
+    // }
 
-    gotConnected(user1:WebSocket, user2:PendingUser){
-        user1.send(JSON.stringify({msg : `hi from ${this.user1Name}`, person : "other" , type : "init_chat"}))
-        user2.socket.send(JSON.stringify({msg : `hi from ${this.user2Name}`, person : "other", type : "init_chat"}))
+    // gotConnected(user1:WebSocket, user2:PendingUser){
+    //     user1.send(JSON.stringify({msg : `hi from ${this.user1Name}`, person : "other" , type : "init_chat"}))
+    //     user2.socket.send(JSON.stringify({msg : `hi from ${this.user2Name}`, person : "other", type : "init_chat"}))
 
-    }
+    // }
 }

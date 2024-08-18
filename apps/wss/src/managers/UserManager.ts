@@ -22,6 +22,25 @@ export class UserManager {
 
         this.addHandler(socket)
     }
+    
+    private sendUserStatus (){
+      clients.forEach((value , key)=>{
+        const metadata = clients.get(key)
+        var existingId = this.onlineIds.find((x)=>{
+            if(x === metadata.profileId){
+                return true
+            } else {
+                return false
+            }
+        })
+        if(!existingId){
+            this.onlineIds.push(metadata.profileId)
+        }
+
+        const resData = {type : "getUsersStatus", profileId : metadata.profileId , onlineIds : this.onlineIds}
+        key.send(JSON.stringify(resData))
+      })
+    }
 
 
     private addHandler(socket: WebSocket){
@@ -32,26 +51,7 @@ export class UserManager {
               const profileId = message.profileId 
               const metadata = { profileId }
               clients.set(socket , metadata)
-        
-            }
-        
-            if(message.type === "getUsersStatus"){
-              clients.forEach((value , key)=>{
-                const metadata = clients.get(key)
-                var existingId = this.onlineIds.find((x)=>{
-                    if(x === metadata.profileId){
-                        return true
-                    } else {
-                        return false
-                    }
-                })
-                if(!existingId){
-                    this.onlineIds.push(metadata.profileId)
-                }
-              })
-              const metadata = clients.get(socket)
-              const resData = {type : "getUsersStatus", profileId : metadata.profileId , onlineIds : this.onlineIds}
-              socket.send(JSON.stringify(resData))
+              this.sendUserStatus();
             }
         
             if(message.type === "close_conn"){
@@ -65,12 +65,12 @@ export class UserManager {
               clients.forEach((value, key)=>{
                 const metadata = clients.get(key)
                 if(message.toProfileId === metadata.profileId){
-
+                  const userId = clients.get(socket)
                   const res = {
                     type : "Message",
                     toProfileId : message.toProfileId,
                     data : message.data,
-                    fromProfileId : message.profileId
+                    fromProfileId : userId.profileId
                   }
 
                   key.send(JSON.stringify(res))
@@ -88,6 +88,9 @@ export class UserManager {
               return id != metadata.profileId
             })
             clients.delete(socket)
+            this.sendUserStatus()
           })
+
+
     }
 }

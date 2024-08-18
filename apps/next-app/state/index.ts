@@ -1,4 +1,10 @@
-
+interface Chats {
+    username : string
+    profilePic : string
+    profileId : string
+    chats : any[]
+    status : any
+}
 import { atom, atomFamily, selector, selectorFamily } from "recoil";
 
 export const dmListAtom = atom({
@@ -6,16 +12,22 @@ export const dmListAtom = atom({
     default : []
 })
 
+
+const chats : any[] = []
+
 export const currentChatAtom = atom({
     key : "currentChatAtom",
     default : {
         username : "",
         profilePic : "",
-        chats : [],
         profileId : "",
-        status : ""
+        status : "",
+        chats : chats
     }
 })
+
+
+
 
 export const onlineIdsAtom = atom({
     key : "onlineIdsAtom",
@@ -24,7 +36,7 @@ export const onlineIdsAtom = atom({
 
 interface resType {
     profileId : string
-    chats : any[]
+    chatMessages : any[]
 }
 
 
@@ -34,9 +46,15 @@ export const chatsAtomFamily = atomFamily({
     default : (id: string) =>{
         const res : resType = {
             profileId : id,
-            chats : []
+            chatMessages : []
         }
         return res
     }
+})
+
+
+export const resAtom = atom ({
+    key : "resAtom",
+    default : {}
 })
 

@@ -4,22 +4,32 @@ import { useEffect, useState } from "react"
 import { Chats } from "./Chats";
 import { SingleProfileType } from "@/app/chats/page";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { dmListAtom, onlineIdsAtom } from "@/state";
+import { chatsAtomFamily, dmListAtom, onlineIdsAtom } from "@/state";
 
 
 
 
 
-export const DmList = ({chatList , loggedInUserSession , ws} : any )=>{
-
-    const [socket, setSocket] = useState<WebSocket | null>(null);
+export const DmList = ({chatList , id , res} : any )=>{
+    // const [chatsAtom, setChatsAtom] = useRecoilState(chatsAtomFamily(id))
+    // const [socket, setSocket] = useState<WebSocket | null>(null);
     const [DmList ,setDmList] = useRecoilState(dmListAtom);
     const onlineIds = useRecoilValue(onlineIdsAtom)
 
     useEffect(() => {
         setDmList(chatList)
-        setSocket(ws)
     }, [])
+
+
+    // useEffect(()=>{
+    //     // setChatsAtom({
+    //     //     profileId : id,
+    //     //     chatMessages : [res]
+    //     // })
+    //     // console.log(res)
+    //     // console.log(chatsAtom)
+    //     // console.log(id)
+    // },[id])
 
 
     return (
@@ -42,7 +52,6 @@ export const DmList = ({chatList , loggedInUserSession , ws} : any )=>{
                     username={chat.username}
                     profilePic={chat.profilePic}
                     profileId={chat.id}
-                    chats={[]}
                     status = {status}
                     />
                 )
