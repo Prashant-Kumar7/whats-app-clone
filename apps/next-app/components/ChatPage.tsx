@@ -4,8 +4,15 @@ import { useEffect, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
-import { chatsAtomFamily, currentChatAtom, onlineIdsAtom, resAtom } from "@/state";
+import { chatsAtomFamily, currentChatAtom, onlineIdsAtom, resAtom, sendAtom } from "@/state";
 import { MessageTemplate } from "./MessageTemplate";
+
+interface ChatAtomPrevType {
+    profileId : string
+    chatMessages : any[]
+    count : number
+    unseen : boolean
+}
 
 
 export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
@@ -18,8 +25,10 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     const [id , setId] = useState("")
     const [chatsAtom, setChatsAtom] = useRecoilState(chatsAtomFamily(id))
     const [response, setRes] = useRecoilState(resAtom)
-    
-
+    const [send , setSend] = useRecoilState(sendAtom)
+    const [incomming, setIncomming] = useState(false)
+    const [outgoing, setOutgoing] = useState(false)
+ 
     const status = onlineIds.find((id)=>{
         if(id === currentChat.profileId){
             return true
@@ -58,16 +67,48 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
         };
     }, [])
 
+
+// handling message distribution in this useEffect
     useEffect(()=>{
-        setChatsAtom((prev)=>{
+        if(send.send){
+            setChatsAtom((prev)=>{
+                return {
+                    ...prev,
+                    chatMessages : [...prev.chatMessages, send.send],
+                    profileId : id
+                }
+            })
+        }
+
+        if(response.response){
+            setChatsAtom((prev)=>{
+                return {
+                    ...prev,
+                    chatMessages : [...prev.chatMessages, response.response],
+                    profileId : id
+                }
+            })
+        }
+
+        setRes(()=>{
             return {
-                profileId : id,
-                chatMessages : [...prev.chatMessages , response]
+                response : null,
+                fromProfileId : ""
             }
         })
-    },[id])
 
 
+        setSend(()=>{
+            return {
+                send : null,
+                fromProfileId : ""
+            }
+        })
+        setIncomming(false)
+        setOutgoing(false)
+    },[id , incomming , outgoing])
+
+//socket operations like sending and reciving
     if(socket){
 
         socket.onmessage = (message) => {
@@ -81,14 +122,14 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
             }
 
             if(res.type === "Message"){
-
+                setIncomming(true)
                 setId(res.fromProfileId)
-                setRes(res)
-                setChatsAtom((prevChats : any)=>{
-                        return {
-                        profileId : res.fromProfileId,
-                        chatMessages : [...prevChats.chatMessages , res]
-                        }
+                setRes((prev)=>{
+                   return { 
+                    ...prev,
+                    response : res,
+                    fromProfileId : res.fromProfileId
+                   }
                 })
 
                 if(res.fromProfileId === currentChat.profileId){
@@ -107,7 +148,7 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
 
 
     function handleSend(){
-        
+        setOutgoing(true)
         const data = {
             type : "Message",
             data : input,
@@ -118,14 +159,14 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
         if(socket){
             socket.send(JSON.stringify(data))
             setId(data.toProfileId)
-            setRes(data)
-
-            setChatsAtom((prevChats : any)=>{
-                    return {
-                        ...prevChats,
-                        chatMessages : [...prevChats.chatMessages , data]
-                    }
+            setSend((prev)=>{
+                return {
+                    ...prev,
+                    send : data,
+                    fromProfileId : data.fromProfileId
+                }
             })
+
             if(data.toProfileId === currentChat.profileId){
                 setCurrentChat((prev)=>{
                     return {

@@ -4,32 +4,41 @@ import { useEffect, useState } from "react"
 import { Chats } from "./Chats";
 import { SingleProfileType } from "@/app/chats/page";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { chatsAtomFamily, dmListAtom, onlineIdsAtom } from "@/state";
+import { chatsAtomFamily, currentChatAtom, dmListAtom, onlineIdsAtom } from "@/state";
 
 
 
 
 
 export const DmList = ({chatList , id , res} : any )=>{
-    // const [chatsAtom, setChatsAtom] = useRecoilState(chatsAtomFamily(id))
+    const [chatsAtom, setChatsAtom] = useRecoilState(chatsAtomFamily(id))
     // const [socket, setSocket] = useState<WebSocket | null>(null);
     const [DmList ,setDmList] = useRecoilState(dmListAtom);
     const onlineIds = useRecoilValue(onlineIdsAtom)
+    // const [unseenMessage , setUnseenMessage] = useState(false)
+
 
     useEffect(() => {
         setDmList(chatList)
     }, [])
 
 
-    // useEffect(()=>{
-    //     // setChatsAtom({
-    //     //     profileId : id,
-    //     //     chatMessages : [res]
-    //     // })
-    //     // console.log(res)
-    //     // console.log(chatsAtom)
-    //     // console.log(id)
-    // },[id])
+    useEffect(()=>{
+        // setChatsAtom({
+        //     profileId : id,
+        //     chatMessages : [res]
+        // })
+        // console.log(res)
+        console.log(chatsAtom)
+        // console.log(id)
+        // setChatsAtom((prev)=>{
+        //     return {
+        //         ...prev,
+
+        //     }
+        // })
+        
+    },[id])
 
 
     return (
@@ -45,7 +54,9 @@ export const DmList = ({chatList , id , res} : any )=>{
                     } 
                     return false
                 })
-
+                
+                
+                
                 return (
                     <Chats
                     key={index}
@@ -53,6 +64,7 @@ export const DmList = ({chatList , id , res} : any )=>{
                     profilePic={chat.profilePic}
                     profileId={chat.id}
                     status = {status}
+                    // seenMessage={seen}
                     />
                 )
             })}

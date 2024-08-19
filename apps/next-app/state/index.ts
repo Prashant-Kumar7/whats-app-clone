@@ -37,6 +37,8 @@ export const onlineIdsAtom = atom({
 interface resType {
     profileId : string
     chatMessages : any[]
+    unseen : boolean
+    count : number
 }
 
 
@@ -46,15 +48,32 @@ export const chatsAtomFamily = atomFamily({
     default : (id: string) =>{
         const res : resType = {
             profileId : id,
-            chatMessages : []
+            chatMessages : [],
+            unseen : false,
+            count : 0
         }
         return res
     }
 })
 
+const res : any = null
 
 export const resAtom = atom ({
     key : "resAtom",
-    default : {}
+    default : {
+        response : res,
+        fromProfileId : ""
+    }
 })
 
+
+const send : any = null
+
+
+export const sendAtom = atom ({
+    key : "sendAtom",
+    default : {
+        send : send,
+        fromProfileId : ""
+    }
+})
