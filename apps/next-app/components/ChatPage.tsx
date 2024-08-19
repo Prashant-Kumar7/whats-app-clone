@@ -75,19 +75,37 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
                 return {
                     ...prev,
                     chatMessages : [...prev.chatMessages, send.send],
-                    profileId : id
+                    profileId : id,
+                    unseen : false,
+                    count : 0,
+
                 }
             })
         }
+
+        
 
         if(response.response){
             setChatsAtom((prev)=>{
                 return {
                     ...prev,
                     chatMessages : [...prev.chatMessages, response.response],
-                    profileId : id
+                    profileId : id,
+                    unseen : true,
+                    count : prev.count + 1
                 }
             })
+
+            if(currentChat.profileId === response.fromProfileId){
+                setChatsAtom((prev)=>{
+                    return {
+                        ...prev,
+                        unseen : false,
+                        count : 0,
+    
+                    }
+                })
+            }
         }
 
         setRes(()=>{
