@@ -77,3 +77,15 @@ export const sendAtom = atom ({
         fromProfileId : ""
     }
 })
+
+
+export const menuAtom = atom({
+    key :"menuAtom",
+    default : false
+})
+
+
+export const settingsAtom = atom({
+    key : "settingsAtom",
+    default : false
+})

@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
-import { chatsAtomFamily, currentChatAtom, onlineIdsAtom, resAtom, sendAtom } from "@/state";
+import { chatsAtomFamily, currentChatAtom, onlineIdsAtom, resAtom, sendAtom, settingsAtom } from "@/state";
 import { MessageTemplate } from "./MessageTemplate";
+import { AccSettings } from "./AccSettings";
 
 interface ChatAtomPrevType {
     profileId : string
@@ -28,7 +29,11 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     const [send , setSend] = useRecoilState(sendAtom)
     const [incomming, setIncomming] = useState(false)
     const [outgoing, setOutgoing] = useState(false)
- 
+    const settings = useRecoilValue(settingsAtom)
+
+
+
+
     const status = onlineIds.find((id)=>{
         if(id === currentChat.profileId){
             return true
@@ -210,6 +215,7 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     return (
         <div className='grid grid-cols-9 h-screen w-screen p-6'>
       <DmList res = {response} id={id} chatList={chatList} loggedInUserSession={loggedInUserSession}/>
+        {settings ? <AccSettings comein={true} /> : <AccSettings comein={false}/>}
       <div style={{height: "100%" , width: "100%"}} className='grid grid-rows-12 col-span-6 bg-slate-900 rounded-r-sm'>
             {/* {chat header} */}
             <div className="p-2 pl-4 row-span-1 flex border-b items-center border-gray-700">
@@ -221,7 +227,6 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
             </div>
             {/* {message area} */}
             <div  className="row-span-10 bg-slate-900 flex gap-4 flex-col p-4">
-
                 {currentChat.chats.map((msg : MessageType , index)=>{
                     return <MessageTemplate
                     key={index}

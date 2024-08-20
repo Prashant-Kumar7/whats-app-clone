@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mui/material": "^5.16.7",
     "@prisma/client": "^5.18.0",
     "@repo/ui": "*",
     "@types/bcrypt": "^5.0.2",

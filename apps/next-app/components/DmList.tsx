@@ -5,6 +5,7 @@ import { Chats } from "./Chats";
 import { SingleProfileType } from "@/app/chats/page";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { chatsAtomFamily, currentChatAtom, dmListAtom, onlineIdsAtom } from "@/state";
+import { Menu} from "./Menu";
 
 
 
@@ -43,8 +44,12 @@ export const DmList = ({chatList , id , res} : any )=>{
 
     return (
         <div className='flex flex-col col-span-3 bg-slate-900 border-r border-gray-600 rounded-l-sm'>
-            <div className="border-b border-slate-700 p-6">
+      {/* <MenuOptions/> */}
+
+            <div className="border-b border-slate-700 flex justify-between p-6">
                 <span className="text-3xl">Chats</span>
+                
+                <Menu/>
             </div>
             {DmList.map((chat :SingleProfileType, index: number)=>{
 
