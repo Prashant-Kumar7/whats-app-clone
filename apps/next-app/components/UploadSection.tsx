@@ -1,17 +1,22 @@
 "use client";
+import { updateAtom } from "@/state";
 import axios from "axios";
 import { FileInput, Label } from "flowbite-react";
 import { useEffect, useState } from "react";
+import { useSetRecoilState } from "recoil";
 export const UploadSection = ({setPicUrl} : any)=>{
 
     const [hover, setHover] = useState(false)
     const [imageUrl , setImageUrl] = useState(null);
+    const setUpdateAtom = useSetRecoilState(updateAtom)
 
 
 
     useEffect(()=>{
         if(imageUrl){
-            axios.put("http://localhost:3000/api/profile" , {profilePic : imageUrl})
+            axios.put("http://localhost:3000/api/profile" , {profilePic : imageUrl}).then(()=>{
+              setUpdateAtom(true)
+            })
         }
     }, [imageUrl])
 

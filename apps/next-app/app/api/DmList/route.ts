@@ -3,10 +3,20 @@ import { NEXT_AUTH_CONFIG } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextRequest, NextResponse } from "next/server"
 
+interface SingleProfileType {
+    id: string;
+    name: string | null;
+    username: string;
+    userId: string;
+    profilePic: string;
+    DmList: string[];
+
+}
+
 export const GET = async()=>{
 
     const session = await getServerSession(NEXT_AUTH_CONFIG);
-    const DmList = await prisma.profile.findUnique({
+    const chatList = await prisma.profile.findUnique({
         where : {
             id : session.user.profileId
         },
@@ -15,7 +25,18 @@ export const GET = async()=>{
         }
     })
 
-    return NextResponse.json(DmList)
+    const allProfiles = await prisma.profile.findMany({});
+
+    const tempArray = chatList?.DmList.map((id)=>{
+        return allProfiles.find((userProfile : SingleProfileType)=>{
+          if(session.user.id == userProfile.userId){
+            console.log("profile Found")
+          }
+          return id === userProfile.id 
+        })
+      })
+
+    return NextResponse.json(tempArray)
 }
 
 

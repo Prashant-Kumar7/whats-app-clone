@@ -1,6 +1,6 @@
 "use client"
 
-import { LoggedInUserAtom, settingsAtom } from "@/state"
+import { LoggedInUserAtom, settingsAtom, updateAtom } from "@/state"
 import axios from "axios"
 import { useEffect, useRef, useState } from "react"
 import { useRecoilState, useSetRecoilState } from "recoil"
@@ -10,7 +10,6 @@ import { UploadSection } from "./UploadSection"
 
 interface PropTypes {
     comein : boolean
-    currentUser : any
 }
 
 
@@ -22,6 +21,7 @@ export const AccSettings = ({comein} : PropTypes )=>{
     const divRef = useRef<HTMLDivElement>(null);
     const [input, setInput] = useState(currentUser.username)
     const [picUrl , setPicUrl] = useState(currentUser.profilePic)
+    const setUpdateAtom = useSetRecoilState(updateAtom)
     function handleBack(){
         setSettings(false)
     }
@@ -42,8 +42,11 @@ export const AccSettings = ({comein} : PropTypes )=>{
 
 
     function handleSubmit(){
-        axios.put("http://localhost:3000/api/profile" , {username : input})
-        setEditClick(false)
+        if(input !== ""){
+            axios.put("http://localhost:3000/api/profile" , {username : input})
+            setEditClick(false)
+            setUpdateAtom(true)
+        }
     }
 
 

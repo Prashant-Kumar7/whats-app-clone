@@ -94,5 +94,11 @@ export const settingsAtom = atom({
 
 export const LoggedInUserAtom = atom ({
     key : "loggedInUserAtom",
-    default : null
+    default : {}
+})
+
+
+export const updateAtom = atom ({
+    key : "updateAtom",
+    default : false
 })

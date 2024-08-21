@@ -4,9 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
-import { chatsAtomFamily, currentChatAtom,  LoggedInUserAtom,  onlineIdsAtom, resAtom, sendAtom, settingsAtom } from "@/state";
+import { chatsAtomFamily, currentChatAtom,  dmListAtom,  LoggedInUserAtom,  onlineIdsAtom, resAtom, sendAtom, settingsAtom, updateAtom } from "@/state";
 import { MessageTemplate } from "./MessageTemplate";
 import { AccSettings } from "./AccSettings";
+import { ChatHeader } from "./ChatHeader";
+import axios from "axios";
 
 interface ChatAtomPrevType {
     profileId : string
@@ -16,15 +18,14 @@ interface ChatAtomPrevType {
 }
 
 
-export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any)=>{
+export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
 
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const setOnlineIds = useSetRecoilState(onlineIdsAtom)
     const [currentChat, setCurrentChat ]= useRecoilState(currentChatAtom)
-    const onlineIds = useRecoilValue(onlineIdsAtom)
     const [input, setInput] = useState("")
     const [id , setId] = useState("")
-    const [chatsAtom, setChatsAtom] = useRecoilState(chatsAtomFamily(id))
+    const  setChatsAtom = useSetRecoilState(chatsAtomFamily(id))
     const [response, setRes] = useRecoilState(resAtom)
     const [send , setSend] = useRecoilState(sendAtom)
     const bottomOfChatRef = useRef<HTMLDivElement>(null)
@@ -32,16 +33,12 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
     const [outgoing, setOutgoing] = useState(false)
     const settings = useRecoilValue(settingsAtom)
     const setCurrentUser = useSetRecoilState(LoggedInUserAtom)
+    const [UpdateAtom,setUpdateAtom] = useRecoilState(updateAtom)
+    const [sendReq , setSendReq] = useState(false)
+    const setDmList = useSetRecoilState(dmListAtom)
     if(loggedInUserSession.user){
         setCurrentUser(loggedInUserSession.user)
     }
-    
-    const status = onlineIds.find((id)=>{
-        if(id === currentChat.profileId){
-            return true
-        }
-        return false
-    })
     
     
     var timer : any
@@ -56,15 +53,15 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
                 chatsList : chatList
             }
             newSocket.send(JSON.stringify(init_conn));
-            const chats : any[] = [];
+            
         }
-        
         setSocket(newSocket);
     }
 
 
     useEffect(() => {
         startConnection()
+        setCurrentUser(loggedInUserSession)
         return () =>{
             const close_conn = {
                 type : "close_conn"
@@ -73,6 +70,43 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
             socket?.send(JSON.stringify(close_conn))
         };
     }, [])
+
+
+// handling update of user in other clients Browser
+    useEffect(()=>{
+        if(UpdateAtom && socket){
+            const data = {
+                type : "Update"
+            }
+
+            socket.send(JSON.stringify(data))
+            setUpdateAtom(false)
+        }
+
+       if(sendReq){
+            axios.get("http://localhost:3000/api/DmList").then((res)=>{
+                const response = res.data;
+                // console.log(response)
+                setDmList(response)
+
+                response.find((profile :any)=>{
+                    if(profile.id === currentChat.profileId){
+                        setCurrentChat((prev)=>{
+                            return {
+                                ...prev,
+                                username : profile.username,
+                                profilePic : profile.profilePic
+                            }
+                        })
+                        return;
+                    }
+                })
+
+                setSendReq(false)
+            })
+       }
+
+    },[UpdateAtom , sendReq])
 
 
 // handling message distribution in this useEffect
@@ -166,6 +200,11 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
                     })
                 }
             }
+
+
+            if(res.type === "updateOccured"){
+                setSendReq(true)
+            }
         }
     }
 
@@ -230,16 +269,10 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
     return (
         <div className='grid grid-cols-9 h-screen w-screen p-6'>
       <DmList res = {response} id={id} chatList={chatList} loggedInUserSession={loggedInUserSession}/>
-        {settings ? <AccSettings currentUser={currentUser} comein={true} /> : <AccSettings currentUser={currentUser} comein={false}/>}
+        {settings ? <AccSettings comein={true} /> : <AccSettings  comein={false}/>}
       <div style={{height: "100%" , width: "100%"}} className='col-span-6 bg-slate-900 rounded-r-sm'>
             {/* {chat header} */}
-            <div className="p-2 pl-4 flex border-b items-center border-gray-700">
-                <img className="rounded-full w-11 h-11 mr-8" src={currentChat.profilePic} alt="" />
-                <div className="flex flex-col">
-                    <span className="text-md text-gray-200">{currentChat.username}</span>
-                    {status? <span className="text-green-500 text-sm">online</span> : <span className="text-gray-500 text-sm">offline</span> }
-                </div>
-            </div>
+            <ChatHeader/>
             {/* {message area} */}
             <div style={{height : "37rem"}} className="bg-slate-900 flex gap-4 flex-col px-4 pt-4 pb-0 w-full overflow-y-auto">
                 {currentChat.chats.map((msg : MessageType , index)=>{

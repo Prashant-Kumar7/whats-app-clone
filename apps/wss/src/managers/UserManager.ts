@@ -77,6 +77,17 @@ export class UserManager {
                 }
               })
             }
+
+
+            if(message.type === "Update"){
+              clients.forEach((value , key)=>{
+                const res = {
+                  type : "updateOccured"
+                }
+
+                key.send(JSON.stringify(res))
+              })
+            }
         
         
           })
