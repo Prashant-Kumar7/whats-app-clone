@@ -16,6 +16,7 @@
     "@types/ws": "^8.5.12",
     "axios": "^1.7.3",
     "bcrypt": "^5.1.1",
+    "flowbite-react": "^0.10.1",
     "next": "14.2.5",
     "next-auth": "^4.24.7",
     "prisma": "^5.18.0",

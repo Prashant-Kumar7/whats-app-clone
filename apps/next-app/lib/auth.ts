@@ -49,8 +49,10 @@ export const NEXT_AUTH_CONFIG = {
                 return {
                   id: user.id,
                   email: user.email,
-                  profileId : profile?.username,
+                  profileId : profile?.id,
                   password : user.password,
+                  profilePic : profile?.profilePic,
+                  username : profile?.username
 
                 };
               } else {
@@ -98,6 +100,8 @@ export const NEXT_AUTH_CONFIG = {
           if (session.user) {
             session.user.id = user?.id
             session.user.profileId = profile?.id
+            session.user.profilePic = profile?.profilePic
+            session.user.username = profile?.username
           }
 
         

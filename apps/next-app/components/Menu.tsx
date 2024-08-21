@@ -35,7 +35,7 @@ export const Menu = ()=>{
 
 
     return ( 
-        <div className="absolute hover:cursor-pointer" onBlur={handleBlur} onFocus={handleFocus} tabIndex={-1} ref={divRef} onClick={handleClick} style={{left : "32rem",width : "2rem" , height : "2rem"}} >
+        <div className="absolute hover:cursor-pointer" onBlur={handleBlur} onFocus={handleFocus} tabIndex={-1} ref={divRef} onClick={handleClick} style={{left : "30%",width : "2rem" , height : "2rem"}} >
             <div  style={{width : "2rem" , height : "2rem"}} className={menu? "flex flex-col bg-slate-700 rounded-full justify-center items-center absolute" : "flex flex-col rounded-full justify-center items-center absolute"}>
                 <div style={{width : "1px" , height : "1px", padding : "2px" , margin : "2px"}} className="rounded-full bg-slate-300"></div>
                 <div style={{width : "1px" , height : "1px", padding : "2px" , margin : "2px"}} className="rounded-full bg-slate-300"></div>

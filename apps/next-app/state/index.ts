@@ -5,6 +5,7 @@ interface Chats {
     chats : any[]
     status : any
 }
+import axios from "axios"
 import { atom, atomFamily, selector, selectorFamily } from "recoil";
 
 export const dmListAtom = atom({
@@ -88,4 +89,10 @@ export const menuAtom = atom({
 export const settingsAtom = atom({
     key : "settingsAtom",
     default : false
+})
+
+
+export const LoggedInUserAtom = atom ({
+    key : "loggedInUserAtom",
+    default : null
 })

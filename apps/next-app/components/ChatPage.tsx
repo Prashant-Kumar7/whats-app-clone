@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
-import { chatsAtomFamily, currentChatAtom, onlineIdsAtom, resAtom, sendAtom, settingsAtom } from "@/state";
+import { chatsAtomFamily, currentChatAtom,  LoggedInUserAtom,  onlineIdsAtom, resAtom, sendAtom, settingsAtom } from "@/state";
 import { MessageTemplate } from "./MessageTemplate";
 import { AccSettings } from "./AccSettings";
 
@@ -16,7 +16,7 @@ interface ChatAtomPrevType {
 }
 
 
-export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
+export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any)=>{
 
     const [socket, setSocket] = useState<WebSocket | null>(null);
     const setOnlineIds = useSetRecoilState(onlineIdsAtom)
@@ -30,10 +30,11 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     const [incomming, setIncomming] = useState(false)
     const [outgoing, setOutgoing] = useState(false)
     const settings = useRecoilValue(settingsAtom)
-
-
-
-
+    const setCurrentUser = useSetRecoilState(LoggedInUserAtom)
+    if(loggedInUserSession.user){
+        setCurrentUser(loggedInUserSession.user)
+    }
+    
     const status = onlineIds.find((id)=>{
         if(id === currentChat.profileId){
             return true
@@ -215,7 +216,7 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     return (
         <div className='grid grid-cols-9 h-screen w-screen p-6'>
       <DmList res = {response} id={id} chatList={chatList} loggedInUserSession={loggedInUserSession}/>
-        {settings ? <AccSettings comein={true} /> : <AccSettings comein={false}/>}
+        {settings ? <AccSettings currentUser={currentUser} comein={true} /> : <AccSettings currentUser={currentUser} comein={false}/>}
       <div style={{height: "100%" , width: "100%"}} className='grid grid-rows-12 col-span-6 bg-slate-900 rounded-r-sm'>
             {/* {chat header} */}
             <div className="p-2 pl-4 row-span-1 flex border-b items-center border-gray-700">

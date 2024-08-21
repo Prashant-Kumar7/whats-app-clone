@@ -6,14 +6,14 @@ export async function fetchAllProfiles() {
     return users
 }
 
-export async function fetchLoggedinProfile(userId :string) {
-    const profile = await prisma.profile.findUnique({
+export async function fetchLoggedinProfile(profileId :string) {
+    const profile = await prisma.profile.findMany({
         where : {
-            userId : userId
+            id : profileId
         }
     })
 
-    return profile
+    return profile[0]
 }
 
 export async function fetchDmList(profileId: string) {

@@ -8,8 +8,12 @@ import { NextRequest, NextResponse } from "next/server";
 //working
 export const GET = async(req: NextRequest)=>{
     const session = await getServerSession(NEXT_AUTH_CONFIG)
-    const profileData = await fetchLoggedinProfile(session.user.id)
-
+    const profileData = await prisma.profile.findUnique({
+        where : {
+            userId : session.user.id
+        }
+    })
+    
 
     return NextResponse.json({
         profile : profileData
@@ -20,7 +24,7 @@ export const GET = async(req: NextRequest)=>{
 export const PUT  = async(req: NextRequest)=>{
     const session = await getServerSession(NEXT_AUTH_CONFIG)
     const body = await req.json();
-    const profileData = await fetchLoggedinProfile(session.user.id)
+    const profileData = await fetchLoggedinProfile(session.user.profileId)
 
     const updateProfile = await prisma.profile.update({
         data : {
