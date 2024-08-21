@@ -51,28 +51,30 @@ export const DmList = ({chatList , id , res} : any )=>{
                 
                 <Menu/>
             </div>
-            {DmList.map((chat :SingleProfileType, index: number)=>{
+            <div style={{height : "40.45rem"}} className="w-full overflow-y-auto">
+                {DmList.map((chat :SingleProfileType, index: number)=>{
 
-                const status = onlineIds.find((x : string)=>{
-                    if(chat.id === x){
-                        return true
-                    } 
-                    return false
-                })
-                
-                
-                
-                return (
-                    <Chats
-                    key={index}
-                    username={chat.username}
-                    profilePic={chat.profilePic}
-                    profileId={chat.id}
-                    status = {status}
-                    // seenMessage={seen}
-                    />
-                )
-            })}
+                    const status = onlineIds.find((x : string)=>{
+                        if(chat.id === x){
+                            return true
+                        } 
+                        return false
+                    })
+                    
+                    
+                    
+                    return (
+                        <Chats
+                        key={index}
+                        username={chat.username}
+                        profilePic={chat.profilePic}
+                        profileId={chat.id}
+                        status = {status}
+                        // seenMessage={seen}
+                        />
+                    )
+                })}
+            </div>
       </div>
     )
 }

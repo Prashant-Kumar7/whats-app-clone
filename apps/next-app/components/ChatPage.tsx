@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
@@ -27,6 +27,7 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
     const [chatsAtom, setChatsAtom] = useRecoilState(chatsAtomFamily(id))
     const [response, setRes] = useRecoilState(resAtom)
     const [send , setSend] = useRecoilState(sendAtom)
+    const bottomOfChatRef = useRef<HTMLDivElement>(null)
     const [incomming, setIncomming] = useState(false)
     const [outgoing, setOutgoing] = useState(false)
     const settings = useRecoilValue(settingsAtom)
@@ -180,7 +181,7 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
             fromProfileId : loggedInUserSession.user.profileId
         }
 
-        if(socket){
+        if(socket && input!==""){
             socket.send(JSON.stringify(data))
             setId(data.toProfileId)
             setSend((prev)=>{
@@ -208,18 +209,31 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
     }
 
 
+    useEffect(()=>{
+        if(bottomOfChatRef.current){
+            bottomOfChatRef.current.scrollIntoView()
+          }
+    },[currentChat.chats , currentChat])
+
+
     function handleChange(e: any){
         setInput(e.target.value)
     }
 
 
+    function handleKeyDown(e : any){
+        if(e.key === "Enter"){
+            handleSend()
+        }
+    }
+
     return (
         <div className='grid grid-cols-9 h-screen w-screen p-6'>
       <DmList res = {response} id={id} chatList={chatList} loggedInUserSession={loggedInUserSession}/>
         {settings ? <AccSettings currentUser={currentUser} comein={true} /> : <AccSettings currentUser={currentUser} comein={false}/>}
-      <div style={{height: "100%" , width: "100%"}} className='grid grid-rows-12 col-span-6 bg-slate-900 rounded-r-sm'>
+      <div style={{height: "100%" , width: "100%"}} className='col-span-6 bg-slate-900 rounded-r-sm'>
             {/* {chat header} */}
-            <div className="p-2 pl-4 row-span-1 flex border-b items-center border-gray-700">
+            <div className="p-2 pl-4 flex border-b items-center border-gray-700">
                 <img className="rounded-full w-11 h-11 mr-8" src={currentChat.profilePic} alt="" />
                 <div className="flex flex-col">
                     <span className="text-md text-gray-200">{currentChat.username}</span>
@@ -227,7 +241,7 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
                 </div>
             </div>
             {/* {message area} */}
-            <div  className="row-span-10 bg-slate-900 flex gap-4 flex-col p-4">
+            <div style={{height : "37rem"}} className="bg-slate-900 flex gap-4 flex-col px-4 pt-4 pb-0 w-full overflow-y-auto">
                 {currentChat.chats.map((msg : MessageType , index)=>{
                     return <MessageTemplate
                     key={index}
@@ -237,11 +251,12 @@ export const ChatPage = ( { chatList , loggedInUserSession , currentUser } : any
                     loggedInProfileId={loggedInUserSession.user.profileId}
                     />
                 })}
+                <div style={{padding : "0px" , margin : "0px"}} className="" ref={bottomOfChatRef}></div>
             </div>
 
             {/* {input field} */}
-            <div className="row-span-1 flex p-2 gap-2 border-t border-gray-700">
-                <input onChange={handleChange} value={input} className="p-2 bg-slate-800 rounded-lg" style={{width : "93%" , height : "100%"}} placeholder="Text message" type="text" />
+            <div className=" flex p-4 gap-2 border-t border-gray-700">
+                <input tabIndex={-1} onChange={handleChange} onKeyDown={handleKeyDown} value={input} className="p-2 bg-slate-800 rounded-lg border-x-0 border-y-0 focus:ring-0 focus:outline-none border-slate-300 focus:caret-slate-500" style={{width : "93%" , height : "2.75rem"}} placeholder="Text message" type="text" />
                 <button onClick={handleSend} className="bg-slate-800 p-2 rounded-lg">send</button>
             </div>
       </div>

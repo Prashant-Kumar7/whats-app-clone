@@ -66,7 +66,7 @@ export const AccSettings = ({comein} : PropTypes )=>{
 
 
 
-                        <input tabIndex={-1} className="bg-transparent text-lg p-2 w-full ml-2 border-b border-x-0 border-t-0 focus:outline-none border-slate-300" style={{border : "0px"}} onChange={handleChange} value={input} type="text" disabled={!editClick} />
+                        <input tabIndex={-1} className="bg-transparent text-lg p-2 w-full ml-2 border-x-0 border-y-0 focus:ring-0 focus:outline-none border-slate-300" onChange={handleChange} value={input} type="text" disabled={!editClick} />
 
 
                         {editClick ? <svg onClick={handleSubmit} viewBox="0 0 24 24" height="30" width="30" preserveAspectRatio="xMidYMid meet" className="mr-6 text-slate-500" version="1.1" x="0px" y="0px" enableBackground="new 0 0 24 24"><title>checkmark</title><path fill="currentColor" d="M9,17.2l-4-4l-1.4,1.3L9,19.9L20.4,8.5L19,7.1L9,17.2z"></path></svg> : <svg onClick={handleEdit} viewBox="0 0 24 24" height="30" width="30" preserveAspectRatio="xMidYMid meet" className="mr-6 text-slate-500" version="1.1" x="0px" y="0px" enableBackground="new 0 0 24 24"><title>pencil</title><path fill="currentColor" d="M3.95,16.7v3.4h3.4l9.8-9.9l-3.4-3.4L3.95,16.7z M19.75,7.6c0.4-0.4,0.4-0.9,0-1.3 l-2.1-2.1c-0.4-0.4-0.9-0.4-1.3,0l-1.6,1.6l3.4,3.4L19.75,7.6z"></path></svg>}
