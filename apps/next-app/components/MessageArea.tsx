@@ -6,13 +6,10 @@ import { MessageTemplate } from "./MessageTemplate"
 import { MessageType } from "./ChatArea"
 import { useEffect, useRef } from "react"
 
-export const MessageArea = ()=>{
+export const MessageArea = ({loggedInUserProfileId} :any)=>{
 
     const bottomOfChatRef = useRef<HTMLDivElement>(null)
     const currentChat = useRecoilValue(currentChatAtom)
-    const loggedInUserSession = useRecoilValue<any>(LoggedInUserAtom);
-
-
 
     useEffect(()=>{
         if(bottomOfChatRef.current){
@@ -28,7 +25,7 @@ export const MessageArea = ()=>{
                 data={msg.data}
                 toProfileId={msg.toProfileId}
                 fromProfileId={msg.fromProfileId}
-                loggedInProfileId={loggedInUserSession.user.profileId}
+                loggedInProfileId={loggedInUserProfileId}
                 />
             })}
             <div style={{padding : "0px" , margin : "0px"}} className="" ref={bottomOfChatRef}></div>

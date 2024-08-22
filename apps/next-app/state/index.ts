@@ -102,3 +102,16 @@ export const updateAtom = atom ({
     key : "updateAtom",
     default : false
 })
+
+
+export const profileInfoAtom = atom ({
+    key : "profileInfoAtom",
+    default : false
+})
+
+
+
+export const viewProfilePicAtom = atom ({
+    key : "viewProfilePicAtom",
+    default : false
+})

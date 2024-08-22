@@ -4,11 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
-import { chatsAtomFamily, currentChatAtom,  dmListAtom,  LoggedInUserAtom,  onlineIdsAtom, resAtom, sendAtom, settingsAtom, updateAtom } from "@/state";
+import { chatsAtomFamily, currentChatAtom,  dmListAtom,  LoggedInUserAtom,  onlineIdsAtom, profileInfoAtom, resAtom, sendAtom, settingsAtom, updateAtom, viewProfilePicAtom } from "@/state";
 import { MessageTemplate } from "./MessageTemplate";
 import { AccSettings } from "./AccSettings";
 import { ChatHeader } from "./ChatHeader";
 import axios from "axios";
+import { MessageArea } from "./MessageArea";
+import { Button, Modal } from "flowbite-react";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { ProfileInfo } from "./ProfileInfo";
 
 interface ChatAtomPrevType {
     profileId : string
@@ -35,7 +39,9 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     const setCurrentUser = useSetRecoilState(LoggedInUserAtom)
     const [UpdateAtom,setUpdateAtom] = useRecoilState(updateAtom)
     const [sendReq , setSendReq] = useState(false)
+    const profileInfoView = useRecoilValue(profileInfoAtom)
     const setDmList = useSetRecoilState(dmListAtom)
+    const [openModal, setOpenModal] = useRecoilState(viewProfilePicAtom)
     if(loggedInUserSession.user){
         setCurrentUser(loggedInUserSession.user)
     }
@@ -270,22 +276,11 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
         <div className='grid grid-cols-9 h-screen w-screen p-6'>
       <DmList res = {response} id={id} chatList={chatList} loggedInUserSession={loggedInUserSession}/>
         {settings ? <AccSettings comein={true} /> : <AccSettings  comein={false}/>}
-      <div style={{height: "100%" , width: "100%"}} className='col-span-6 bg-slate-900 rounded-r-sm'>
-            {/* {chat header} */}
+      <div style={{height: "100%" , width: "100%"}} className={profileInfoView? 'col-span-4 bg-slate-900 rounded-r-sm ease-in-out duration-500' : 'col-span-6 bg-slate-900 rounded-r-sm ease-in-out duration-500'}>
+   
             <ChatHeader/>
-            {/* {message area} */}
-            <div style={{height : "37rem"}} className="bg-slate-900 flex gap-4 flex-col px-4 pt-4 pb-0 w-full overflow-y-auto">
-                {currentChat.chats.map((msg : MessageType , index)=>{
-                    return <MessageTemplate
-                    key={index}
-                    data={msg.data}
-                    toProfileId={msg.toProfileId}
-                    fromProfileId={msg.fromProfileId}
-                    loggedInProfileId={loggedInUserSession.user.profileId}
-                    />
-                })}
-                <div style={{padding : "0px" , margin : "0px"}} className="" ref={bottomOfChatRef}></div>
-            </div>
+
+            <MessageArea loggedInUserProfileId={loggedInUserSession.user.profileId}/>
 
             {/* {input field} */}
             <div className=" flex p-4 gap-2 border-t border-gray-700">
@@ -293,6 +288,16 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
                 <button onClick={handleSend} className="bg-slate-800 p-2 rounded-lg">send</button>
             </div>
       </div>
+      <div className={profileInfoView ? "bg-slate-900 col-span-2" : "hidden"}></div>
+      {profileInfoView ? <ProfileInfo comein={true} /> : <ProfileInfo  comein={false}/>}
+
+      <Modal show={openModal} style={{overflow: "hidden"}} className="backdrop-blur-sm bg-gray/30 p-0 border-0 overscroll-none" onClose={() => setOpenModal(false)} popup>
+            {/* <Modal.Header /> */}
+            <span onClick={()=>setOpenModal(false)} style={{marginBottom : "0px"}} className="flex justify-end text-3xl absolute right-0 hover:cursor-pointer">X</span>
+            <Modal.Body className="flex justify-center p-0 border-0">
+              <img style={{width : "43rem" , height : "48rem"}} src={currentChat.profilePic} alt="" />
+            </Modal.Body>
+          </Modal>
     </div>
     )
 }
