@@ -20,8 +20,6 @@ export const DmList = ({chatList , id} : any )=>{
         setDmList(chatList)
     }, [])
 
-
-
     return (
         <div className='flex flex-col col-span-3 bg-slate-900 border-r border-gray-600 rounded-l-sm'>
             <div className="border-b border-slate-700 flex justify-between p-6">

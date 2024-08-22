@@ -88,6 +88,21 @@ export class UserManager {
                 key.send(JSON.stringify(res))
               })
             }
+
+
+            if(message.type === "Typing"){
+              const myMetaData = clients.get(socket);
+              clients.forEach((value, key)=>{
+                const metadata = clients.get(key)
+                if(metadata.profileId === message.profileId){
+                  const res = {
+                    type : "typing",
+                    profileId : myMetaData.profileId
+                  }
+                  key.send(JSON.stringify(res))
+                }
+              })
+            }
         
         
           })

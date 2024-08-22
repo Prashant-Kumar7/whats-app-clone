@@ -16,6 +16,7 @@ export const dmListAtom = atom({
 
 const chats : any[] = []
 
+ 
 export const currentChatAtom = atom({
     key : "currentChatAtom",
     default : {
@@ -23,6 +24,7 @@ export const currentChatAtom = atom({
         profilePic : "",
         profileId : "",
         status : "",
+        typing : null,
         chats : chats
     }
 })
@@ -40,6 +42,7 @@ interface resType {
     chatMessages : any[]
     unseen : boolean
     count : number
+    typing : boolean
 }
 
 
@@ -51,7 +54,8 @@ export const chatsAtomFamily = atomFamily({
             profileId : id,
             chatMessages : [],
             unseen : false,
-            count : 0
+            count : 0,
+            typing : false
         }
         return res
     }
@@ -114,4 +118,12 @@ export const profileInfoAtom = atom ({
 export const viewProfilePicAtom = atom ({
     key : "viewProfilePicAtom",
     default : false
+})
+
+export const typingAtom = atom ({
+    key : "typingAtom",
+    default : {
+        typing : false,
+        profileId : ""
+    }
 })

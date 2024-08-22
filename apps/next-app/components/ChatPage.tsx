@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
-import { chatsAtomFamily, currentChatAtom,  dmListAtom,  LoggedInUserAtom,  onlineIdsAtom, profileInfoAtom, resAtom, sendAtom, settingsAtom, updateAtom, viewProfilePicAtom } from "@/state";
+import { chatsAtomFamily, currentChatAtom,  dmListAtom,  LoggedInUserAtom,  onlineIdsAtom, profileInfoAtom, resAtom, sendAtom, settingsAtom, typingAtom, updateAtom, viewProfilePicAtom } from "@/state";
 import { MessageTemplate } from "./MessageTemplate";
 import { AccSettings } from "./AccSettings";
 import { ChatHeader } from "./ChatHeader";
@@ -42,6 +42,7 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     const profileInfoView = useRecoilValue(profileInfoAtom)
     const setDmList = useSetRecoilState(dmListAtom)
     const [openModal, setOpenModal] = useRecoilState(viewProfilePicAtom)
+    const [typing, setTyping] = useRecoilState(typingAtom)
     if(loggedInUserSession.user){
         setCurrentUser(loggedInUserSession.user)
     }
@@ -76,6 +77,35 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
             socket?.send(JSON.stringify(close_conn))
         };
     }, [])
+
+
+
+
+// This useEffect is used to listen to typing profiles
+    useEffect(()=>{
+        if(typing.typing){
+            setChatsAtom((prev :any)=>{
+                return {
+                    ...prev,
+                    typing : typing.typing
+                }
+            })
+            if(typing.profileId === currentChat.profileId){
+                setCurrentChat((prev : any)=>{
+                    return {
+                        ...prev,
+                        typing : typing.typing
+                    }
+                })
+            }
+
+            setTyping({
+                typing : false,
+                profileId : ""
+            })
+
+        }
+    },[id , incomming])
 
 
 // handling update of user in other clients Browser
@@ -211,6 +241,16 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
             if(res.type === "updateOccured"){
                 setSendReq(true)
             }
+
+            if(res.type === "typing"){
+                setTyping({
+                    typing : true,
+                    profileId : res.profileId
+                })
+                setIncomming(true)
+                setId(res.profileId)
+              }
+
         }
     }
 
@@ -263,6 +303,13 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
 
     function handleChange(e: any){
         setInput(e.target.value)
+        const typeObj = {
+            type : "Typing",
+            profileId : currentChat.profileId
+        }
+        if(socket && input!==""){
+          socket.send(JSON.stringify(typeObj))
+        }
     }
 
 
