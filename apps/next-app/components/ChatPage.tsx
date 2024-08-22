@@ -13,6 +13,7 @@ import { MessageArea } from "./MessageArea";
 import { Button, Modal } from "flowbite-react";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import { ProfileInfo } from "./ProfileInfo";
+import { LandingChatArea } from "./LandingChatArea";
 
 interface ChatAtomPrevType {
     profileId : string
@@ -323,7 +324,7 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
         <div className='grid grid-cols-9 h-screen w-screen p-6'>
       <DmList res = {response} id={id} chatList={chatList} loggedInUserSession={loggedInUserSession}/>
         {settings ? <AccSettings comein={true} /> : <AccSettings  comein={false}/>}
-      <div style={{height: "100%" , width: "100%"}} className={profileInfoView? 'col-span-4 bg-slate-900 rounded-r-sm ease-in-out duration-500' : 'col-span-6 bg-slate-900 rounded-r-sm ease-in-out duration-500'}>
+      {currentChat.profileId?<div style={{height: "100%" , width: "100%"}} className={profileInfoView? 'col-span-4 bg-slate-900 rounded-r-sm ease-in-out duration-500' : 'col-span-6 bg-slate-900 rounded-r-sm ease-in-out duration-500'}>
    
             <ChatHeader/>
 
@@ -334,7 +335,7 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
                 <input tabIndex={-1} onChange={handleChange} onKeyDown={handleKeyDown} value={input} className="p-2 bg-slate-800 rounded-lg border-x-0 border-y-0 focus:ring-0 focus:outline-none border-slate-300 focus:caret-slate-500" style={{width : "93%" , height : "2.75rem"}} placeholder="Text message" type="text" />
                 <button onClick={handleSend} className="bg-slate-800 p-2 rounded-lg">send</button>
             </div>
-      </div>
+      </div> : <LandingChatArea/>}
       <div className={profileInfoView ? "bg-slate-900 col-span-2" : "hidden"}></div>
       {profileInfoView ? <ProfileInfo comein={true} /> : <ProfileInfo  comein={false}/>}
 
