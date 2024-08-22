@@ -35,7 +35,7 @@ export const ChatHeader = ()=>{
     }
 
     return (
-        <div onClick={handleProfileView} className="p-2 pl-4 flex border-b items-center hover:cursor-pointer border-gray-700">
+        <div onClick={handleProfileView} className="p-2 pl-4 flex bg-slate-800 items-center hover:cursor-pointer">
             <img className="rounded-full w-11 h-11 mr-8" src={currentChat.profilePic} alt="" />
             <div className="flex flex-col">
                 <span className="text-md text-gray-200">{currentChat.username}</span>

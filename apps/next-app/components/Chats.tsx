@@ -57,7 +57,7 @@ export const Chats = ({username , profilePic, profileId, status} : any)=>{
     
 
     return (
-        <div onClick={handleClick} className={ currentChat.profileId === profileId ? "p-4 flex justify-between bg-slate-800 border-b border-slate-700 hover:cursor-pointer hover:bg-slate-800 " : " hover:cursor-pointer hover:bg-slate-800 p-4 flex border-b justify-between border-slate-700" }>
+        <div onClick={handleClick} className={ currentChat.profileId === profileId ? "p-4 flex justify-between bg-slate-700 border-b border-gray-800 hover:cursor-pointer" : " hover:cursor-pointer hover:bg-slate-800 p-4 flex border-b justify-between border-gray-800" }>
             <div className="flex gap-4">
                 {status ? <div style={{height : "0.66rem" , width : "0.66rem" , marginLeft : "-10px"}} className="rounded-full bg-green-600 relative left-14 top-7"></div> : <div></div> }
 

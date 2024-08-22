@@ -331,9 +331,9 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
             <MessageArea loggedInUserProfileId={loggedInUserSession.user.profileId}/>
 
             {/* {input field} */}
-            <div className=" flex p-4 gap-2 border-t border-gray-700">
-                <input tabIndex={-1} onChange={handleChange} onKeyDown={handleKeyDown} value={input} className="p-2 bg-slate-800 rounded-lg border-x-0 border-y-0 focus:ring-0 focus:outline-none border-slate-300 focus:caret-slate-500" style={{width : "93%" , height : "2.75rem"}} placeholder="Text message" type="text" />
-                <button onClick={handleSend} className="bg-slate-800 p-2 rounded-lg">send</button>
+            <div className=" flex p-4 gap-2 bg-slate-800">
+                <input tabIndex={-1} onChange={handleChange} onKeyDown={handleKeyDown} value={input} className="p-2 bg-slate-700 rounded-lg border-x-0 border-y-0 focus:ring-0 focus:outline-none border-slate-300 focus:caret-slate-500" style={{width : "93%" , height : "2.75rem"}} placeholder="Text message" type="text" />
+                <button onClick={handleSend} className="bg-slate-700 p-2 rounded-lg">send</button>
             </div>
       </div> : <LandingChatArea/>}
       <div className={profileInfoView ? "bg-slate-900 col-span-2" : "hidden"}></div>
