@@ -4,6 +4,10 @@ import { signIn, signOut } from "next-auth/react"
 import { Menu } from "./Menu"
 import { UploadSection } from "./UploadSection"
 
+
+
+
+
 export const Appbar = ()=>{
     return (
         <div className="flex p-4">
