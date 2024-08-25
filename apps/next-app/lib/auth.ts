@@ -113,7 +113,7 @@ export const NEXT_AUTH_CONFIG = {
           return session
       }
     },
-    // pages: {
-    //     signIn: '/signin',
-    // }
+    pages: {
+        signIn: '/signin',
+    }
   }
