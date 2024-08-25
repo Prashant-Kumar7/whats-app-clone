@@ -1,39 +1,20 @@
-import { Appbar } from "@/components/Appbar"
-import { UserList } from "@/components/UserList"
-import { NEXT_AUTH_CONFIG } from "@/lib/auth"
-import { fetchAllProfiles } from "@/lib/data"
-import { getServerSession } from "next-auth"
+import { Signup } from "@/components/Signup";
 
-export interface UserType {
-    id: string;
-    email: string;
-    password: string;
-    createdOn: Date;
-}
-
-export default async function ProfileList(){
-
-
-  const session = await getServerSession(NEXT_AUTH_CONFIG)
-  
-  const users =  await fetchAllProfiles();
-
-  return (
-      <div style={{height: "100vh"}} className=" w-screen flex flex-col gap-4 p-3">
-        <Appbar/>
-          <div className="p-6 bg-red-400">
-              <span className="text-3xl">Profile List</span>
-          </div>
-          {users.map((user : any , index)=>{
-            return(
-              <UserList
-              key={index}
-              username={user.username}
-              profileId={user.id}
-              />
-            )
-          })}
-          {JSON.stringify(session)}
-      </div>
-  )
+export default function (){
+    return (
+        <div className="h-screen w-screen p-6">
+            <div className=" grid grid-cols-9 bg-slate-900 w-full h-full">
+                <div className="col-span-6 flex flex-col items-center p-40">
+                    <h1 className="p-10 text-left w-full text-green-600 font-bold text-5xl">LinkUp</h1>
+                    <p className="text-gray-400 text-xl pl-10">Connect instantly with people from around the world. <br />
+                        Voice and video calls: Have face-to-face conversations with your friends and family.
+                    </p>
+                    <span></span>
+                </div>
+                <div className="border-l border-gray-700 col-span-3 h-full w-full flex justify-center items-center ">
+                  <Signup/>
+                </div>
+            </div>
+        </div>
+    )
 }

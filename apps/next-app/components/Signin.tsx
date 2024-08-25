@@ -4,6 +4,7 @@ import axios from "axios"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { signIn } from "next-auth/react"
+import { Eye } from "./Signup"
 
 export const Signin = ()=>{
 
@@ -17,7 +18,7 @@ export const Signin = ()=>{
 
     const route = useRouter()
 
-    const [match, setMatch] = useState(true)
+    const [visible,setVisible] = useState(false)
 
     function handleChange(e: any){
         const {name , value} = e.target
@@ -50,7 +51,10 @@ export const Signin = ()=>{
                     <div style={{width: "28rem"}} className="bg-slate-800 rounded-2xl pb-6">
                         <h1 className="text-4xl p-8 w-full text-left text-gray-400 font-semibold">Login</h1>
                         <input onChange={handleChange} className="bg-transparent ml-8 w-96 rounded-lg focus:ring-indigo-900 text-lg text-gray-300" name="email" placeholder="Enter email" type="email" required/>
-                        <input onChange={handleChange} className="bg-transparent ml-8 w-96 rounded-lg focus:ring-indigo-900 text-lg text-gray-300 my-8 mb-4" name="password" placeholder="Enter password" type="password" required/>
+                        <div className="flex items-center">
+                            <input onChange={handleChange} className="bg-transparent ml-8 w-96 rounded-lg focus:ring-indigo-900 text-lg text-gray-300 my-8" name="password" placeholder="Enter password" type={visible ? "text" : "password"} required/>
+                            <Eye visible={visible} setVisible={setVisible}/>
+                        </div>
                         <div className={err ? "text-red-600 text-sm pl-8 my-2" : " hidden" }>Incorrect credentials!!</div>
                         <button onClick={handleSubmit} className="bg-indigo-900 p-2 text-lg rounded-xl  ml-8">Signup</button>
                         <span onClick={()=>route.push("/signup")} className="ml-8 hover:underline-offset-4 hover:underline hover:text-indigo-300 hover:cursor-pointer text-gray-400">Create account?</span>
