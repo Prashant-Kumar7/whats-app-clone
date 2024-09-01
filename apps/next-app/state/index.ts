@@ -95,6 +95,11 @@ export const settingsAtom = atom({
     default : false
 })
 
+export const callVisibleAtom = atom({
+    key : "callVisibleAtom",
+    default : false
+})
+
 
 export const LoggedInUserAtom = atom ({
     key : "loggedInUserAtom",
@@ -126,4 +131,60 @@ export const typingAtom = atom ({
         typing : false,
         profileId : ""
     }
+})
+
+export const initCallAtom = atom({
+    key : "initCallAtom",
+    default : false
+})
+
+export const currentProfileCallAtom = atom({
+    key : "currentProfileCall",
+    default : {
+        username : "",
+        profilePic : "",
+        profileId : "",
+    }
+})
+
+export const micStatusAtom = atom({
+    key : "MicStatusAtom",
+    default : true
+})
+
+
+export const acceptCallAtom = atom({
+    key : "acceptCallAtom",
+    default : false
+})
+
+
+export const rejectCallAtom = atom ({
+    key :"rejectCallAtom",
+    default : false
+})
+
+export const missedCallAtom = atom ({
+    key : "missedCall Atom",
+    default : false
+})
+
+export const incommingCallAtom = atom({
+    key: "incommingCallAtom",
+    default : false
+})
+
+export const backToCallAtom = atom ({
+    key: "backToCallAtom",
+    default : true
+})
+
+export const connectedAtom = atom ({
+    key: "connectedAtom",
+    default : false
+})
+
+export const disconnectAtom = atom({
+    key : "disconnectAtom",
+    default : false
 })

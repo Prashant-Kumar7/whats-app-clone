@@ -16,6 +16,7 @@ export class RoomManger {
     private msgArray : any[];
     public user1Id : string
     public user2Id : string
+    private ringTimer : any
 
     constructor (user1: WebSocket, user2:WebSocket){
         this.user1 = user1
@@ -27,33 +28,69 @@ export class RoomManger {
 
     // msg: { sender: WebSocket; message: string; }
 
-    sendMessages(socket: WebSocket, message : MsgObjType){
-        console.log("inside room Manager")
-        if(socket === this.user1){
+    // sendMessages(socket: WebSocket, message : MsgObjType){
+    //     console.log("inside room Manager")
+    //     if(socket === this.user1){
 
-            const res = {
-                type : message.type,
-                toProfileId : this.user2Id,
-                data : message.data,
-                fromProfileId : this.user1Id
-            }
+    //         const res = {
+    //             type : message.type,
+    //             toProfileId : this.user2Id,
+    //             data : message.data,
+    //             fromProfileId : this.user1Id
+    //         }
 
-            this.user2.send(JSON.stringify(res))
-            // this.msgArray.push(msgObj)
+    //         this.user2.send(JSON.stringify(res))
+    //         // this.msgArray.push(msgObj)
 
-        } else {
-            const res = {
-                type : message.type,
-                toProfileId : this.user1Id,
-                data : message.data,
-                fromProfileId : this.user2Id
-            }
+    //     } else {
+    //         const res = {
+    //             type : message.type,
+    //             toProfileId : this.user1Id,
+    //             data : message.data,
+    //             fromProfileId : this.user2Id
+    //         }
 
-            this.user1.send(JSON.stringify(res))
-            // this.msgArray.push(msgObj)
-        }
-    }
+    //         this.user1.send(JSON.stringify(res))
+    //         // this.msgArray.push(msgObj)
+    //     }
+    // }
 
+    
+
+    // initCall(socket : WebSocket , profileId : any){
+
+        
+
+    //     socket.send(JSON.stringify({type : "init_call" , profileId : profileId}))
+    //     if(this.ringTimer){
+    //         clearTimeout(this.ringTimer)
+    //         this.ringTimer = null
+    //     }
+    //     console.log(this.ringTimer)
+    //     this.ringTimer = setTimeout(()=>{
+    //         this.user1.send(JSON.stringify({type : "notConnected"}))
+    //         this.user2.send(JSON.stringify({type : "notConnected"}))
+    //     }, 10000)
+
+    //     // this.rejectCall()
+
+
+    // }
+
+    // callEnded(){
+    //     clearTimeout(this.ringTimer)
+    //     this.ringTimer = null
+    //     this.user1.send(JSON.stringify({type : "notConnected"}))
+    //     this.user2.send(JSON.stringify({type : "notConnected"}))
+    // }
+
+
+    // rejectCall(){
+    //     clearTimeout(this.ringTimer)
+    //     this.ringTimer = null
+    //     this.user1.send(JSON.stringify({type : "notConnected"}))
+    //     this.user2.send(JSON.stringify({type : "notConnected"}))
+    // }
 
     // typingState(socket: WebSocket){
     //     if(socket === this.user1.socket){

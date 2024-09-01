@@ -13,9 +13,10 @@ const clients = new Map()
 
 export class UserManager {
     private onlineIds : string[]
-    
+    private rooms : RoomManger[]
     constructor() {
         this.onlineIds = [];
+        this.rooms = []
     }
 
     addUser(socket: WebSocket) {
@@ -104,9 +105,72 @@ export class UserManager {
               })
             }
         
-        
-          })
+            if(message.type === "init_call"){
+              const myMetaData = clients.get(socket);
+              clients.forEach((value, key)=>{
+                const metadata = clients.get(key);
+                if(metadata.profileId === message.profileId){
+                  // const room = new RoomManger(key, socket);
+                  // this.rooms.push(room)
+                  // room.initCall(key , myMetaData.profileId)
+                  key.send(JSON.stringify({type : "init_call" , profileId : myMetaData.profileId}))
+                }
+              })
 
+              
+
+            }
+
+            const room = this.rooms.find(room=> room.user1 === socket || room.user2 === socket);
+
+
+            if(message.type === "callEnded"){
+              clients.forEach((value, key)=>{
+                const metadata = clients.get(key);
+                if(metadata.profileId === message.profileId){
+                  key.send(JSON.stringify({type : "notConnected"}))
+                  socket.send(JSON.stringify({type : "notConnected"}))
+                }
+              })
+            }
+
+            if(message.type === "callRejected"){
+              clients.forEach((value, key)=>{
+                const metadata = clients.get(key);
+                if(metadata.profileId === message.profileId){
+                  key.send(JSON.stringify({type : "notConnected"}))
+                  socket.send(JSON.stringify({type : "notConnected"}))
+                }
+              })
+              // if(room){
+              //   room.rejectCall()
+              // }
+            }
+
+
+            if(message.type === "callAccpeted"){
+
+
+              clients.forEach((value, key)=>{
+                const metadata = clients.get(key);
+                if(metadata.profileId === message.profileId){
+                  key.send(JSON.stringify({type : "connected"}))
+                  socket.send(JSON.stringify({type : "connected"}))
+                }
+              })
+            }
+
+            if(message.type === "disconnected"){
+              clients.forEach((value, key)=>{
+                const metadata = clients.get(key);
+                if(metadata.profileId === message.profileId){
+                  key.send(JSON.stringify({type : "disconnected"}))
+                  socket.send(JSON.stringify({type : "disconnected"}))
+                }
+              })
+            }
+
+          })
           socket.on('close' , (number , reason)=>{
             const metadata = clients.get(socket)
 
