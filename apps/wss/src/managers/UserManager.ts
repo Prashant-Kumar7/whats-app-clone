@@ -25,19 +25,9 @@ export class UserManager {
     }
     
     private sendUserStatus (){
+      // const myMetaData = clients.get(socket)
       clients.forEach((value , key)=>{
         const metadata = clients.get(key)
-        var existingId = this.onlineIds.find((x)=>{
-            if(x === metadata.profileId){
-                return true
-            } else {
-                return false
-            }
-        })
-        if(!existingId){
-            this.onlineIds.push(metadata.profileId)
-        }
-
         const resData = {type : "getUsersStatus", profileId : metadata.profileId , onlineIds : this.onlineIds}
         key.send(JSON.stringify(resData))
       })
@@ -52,6 +42,7 @@ export class UserManager {
               const profileId = message.profileId 
               const metadata = { profileId }
               clients.set(socket , metadata)
+              this.onlineIds.push(profileId)
               this.sendUserStatus();
             }
         
@@ -113,7 +104,7 @@ export class UserManager {
                   // const room = new RoomManger(key, socket);
                   // this.rooms.push(room)
                   // room.initCall(key , myMetaData.profileId)
-                  key.send(JSON.stringify({type : "init_call" , profileId : myMetaData.profileId}))
+                  key.send(JSON.stringify({type : "init_call" , profileId : myMetaData.profileId, roomId : message.roomId}))
                 }
               })
 
@@ -122,6 +113,15 @@ export class UserManager {
             }
 
             const room = this.rooms.find(room=> room.user1 === socket || room.user2 === socket);
+
+            if(message.type === "hung_up"){
+              clients.forEach((value, key)=>{
+                const metadata = clients.get(key);
+                if(metadata.profileId === message.profileId){
+                  key.send(JSON.stringify({type : "hung_up"}))
+                }
+              })
+            }
 
 
             if(message.type === "callEnded"){
@@ -154,21 +154,83 @@ export class UserManager {
               clients.forEach((value, key)=>{
                 const metadata = clients.get(key);
                 if(metadata.profileId === message.profileId){
-                  key.send(JSON.stringify({type : "connected"}))
-                  socket.send(JSON.stringify({type : "connected"}))
+                  // key.send(JSON.stringify({type : "connected"}))
+                  // socket.send(JSON.stringify({type : "connected"}))
+                  const room = new RoomManger(key , socket)
+                  this.rooms.push(room)
+                  room.gotConnected(key , socket)
                 }
               })
             }
 
-            if(message.type === "disconnected"){
-              clients.forEach((value, key)=>{
-                const metadata = clients.get(key);
-                if(metadata.profileId === message.profileId){
-                  key.send(JSON.stringify({type : "disconnected"}))
-                  socket.send(JSON.stringify({type : "disconnected"}))
-                }
-              })
+            const currentRoom = this.rooms.find(room=> room.user1 === socket || room.user2 === socket);
+
+
+            if(message.type === "createOffer"){
+              if(currentRoom){
+                currentRoom.sendOffer(socket, message)
+              }
             }
+
+
+            if(message.type === "createAnswer"){
+              if(currentRoom){
+                currentRoom.sendAnswer(socket, message)
+              }
+            }
+
+
+            if(message.type === "iceCandidate"){
+              if(currentRoom){
+                currentRoom.sendIceCandidate(socket, message)
+              }
+            }
+
+            if(message.type === "disconnected"){
+              if(currentRoom){
+                currentRoom.gotDisconnected();
+              }
+            }
+
+            // if(message.type === "createOffer"){
+            //   clients.forEach((value, key)=>{
+            //     const metadata = clients.get(key);
+            //     if(metadata.profileId === message.profileId){
+            //       key.send(JSON.stringify(message))                  
+            //     }
+            //   })
+            // }
+          
+          
+            // if(message.type === "createAnswer"){
+            //   clients.forEach((value, key)=>{
+            //     const metadata = clients.get(key);
+            //     if(metadata.profileId === message.profileId){
+            //       key.send(JSON.stringify(message))
+
+            //     }
+            //   })
+            // }
+          
+            // if(message.type === "iceCandidate"){
+            //   clients.forEach((value, key)=>{
+            //     const metadata = clients.get(key);
+            //     if(metadata.profileId === message.profileId){
+            //       key.send(JSON.stringify(message))
+            //     }
+            //   })
+            // }
+          
+          
+            // if(message.type === "disconnected"){
+            //   clients.forEach((value, key)=>{
+            //     const metadata = clients.get(key);
+            //     if(metadata.profileId === message.profileId){
+            //       key.send(JSON.stringify({type : "disconnected"}))
+            //       socket.send(JSON.stringify({type : "disconnected"}))
+            //     }
+            //   })
+            // }
 
           })
           socket.on('close' , (number , reason)=>{

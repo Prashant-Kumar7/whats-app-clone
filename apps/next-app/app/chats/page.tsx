@@ -43,6 +43,7 @@ export default async function MainChats(){
 
 
   return (
+    
     <ChatPage currentChat={userData} chatList={tempArray} loggedInUserSession = {session}/>
   )
 }

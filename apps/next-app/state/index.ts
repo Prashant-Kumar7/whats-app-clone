@@ -188,3 +188,14 @@ export const disconnectAtom = atom({
     key : "disconnectAtom",
     default : false
 })
+
+
+export const micClickedAtom = atom({
+    key : "micClickedAtom",
+    default : false
+})
+
+export const muteAtom = atom({
+    key : "muteAtom",
+    default : false
+})

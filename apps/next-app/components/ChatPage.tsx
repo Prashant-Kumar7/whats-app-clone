@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChatArea, MessageType } from "./ChatArea"
 import { DmList } from "./DmList"
 import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
-import { acceptCallAtom, callVisibleAtom, chatsAtomFamily, connectedAtom, currentChatAtom,  currentProfileCallAtom,  disconnectAtom,  dmListAtom,  incommingCallAtom,  initCallAtom,  LoggedInUserAtom,  missedCallAtom,  onlineIdsAtom, profileInfoAtom, rejectCallAtom, resAtom, sendAtom, settingsAtom, typingAtom, updateAtom, viewProfilePicAtom } from "@/state";
+import { acceptCallAtom, callVisibleAtom, chatsAtomFamily, connectedAtom, currentChatAtom,  currentProfileCallAtom,  disconnectAtom,  dmListAtom,  incommingCallAtom,  initCallAtom,  LoggedInUserAtom,  micClickedAtom,  micStatusAtom,  missedCallAtom,  muteAtom,  onlineIdsAtom, profileInfoAtom, rejectCallAtom, resAtom, sendAtom, settingsAtom, typingAtom, updateAtom, viewProfilePicAtom } from "@/state";
 import { MessageTemplate } from "./MessageTemplate";
 import { AccSettings } from "./AccSettings";
 import { ChatHeader } from "./ChatHeader";
@@ -17,7 +17,13 @@ import { LandingChatArea } from "./LandingChatArea";
 import { IncommingCall } from "./IncommingCall";
 import { Calling } from "./Calling";
 import { Connected } from "./Connected";
+import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
+// import { Room } from "@livekit/protocol";
+// import { connect } from "livekit-client";
+import { Track , Room, RoomEvent, createLocalAudioTrack,} from 'livekit-client';
 
+
+const serverUrl = 'wss://live-stream-j0ngkwts.livekit.cloud';
 
 export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
 
@@ -50,6 +56,14 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     const [callEnded, setCallEnded] = useRecoilState(missedCallAtom)
     const [connected , setConnected] = useRecoilState(connectedAtom)
     const [disconnect, setDisconnect] = useRecoilState(disconnectAtom)
+    const remoteAudio = useRef<HTMLAudioElement>(null)
+    const [localStream , setLocalStream] = useState<MediaStream>()
+    const [micStatus , setMicStatus] = useRecoilState(micStatusAtom)
+    const micClicked = useRecoilValue(micClickedAtom)
+    const [token , setToken] = useState("")
+    const [roomId , setRoomId] = useState("")
+    const [room, setRoom] = useState<Room | undefined>()
+    const [mute, setMute] = useRecoilState(muteAtom)
 
 
     if(loggedInUserSession.user){
@@ -78,6 +92,30 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
 
     }
 
+    useEffect(()=>{
+        if(connected){
+            axios.post("http://localhost:3000/api/call/token" , {name : Math.random().toString(), rommId : roomId}).then((res)=>{
+                setToken(res.data.token)
+                const roomInstance = new Room()
+                roomInstance.connect(serverUrl, res.data.token)
+                setRoom(roomInstance)
+                console.log(roomInstance)
+            })
+        }
+    },[connected])
+  
+    
+
+    useEffect(()=>{
+        if(CallVisiblity){
+            axios.post("http://localhost:3000/api/call/createRoom").then((res)=>{
+                setRoomId(res.data.roomId)
+            })
+            socket?.send(JSON.stringify({type : "init_call" , profileId : currentProfileCall.profileId, roomId : roomId}))
+            
+        }
+    },[CallVisiblity])
+
 
     useEffect(() => {
         startConnection()
@@ -88,10 +126,15 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
             }
             clearInterval(timer)
             socket?.send(JSON.stringify(close_conn))
+            if(room)room.disconnect()
         };
     }, [])
 
-
+    useEffect(()=>{
+        if(disconnect){
+            socket?.send(JSON.stringify({type : "hung_up", profileId : currentProfileCall.profileId}))
+        }
+    },[disconnect])
 
 
 // This useEffect is used to listen to typing profiles
@@ -216,9 +259,9 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     },[id , incomming , outgoing])
 
 //socket operations like sending and reciving
-    if(socket){
+    if(socket &&pc){
 
-        socket.onmessage = (message) => {
+        socket.onmessage = async(message) => {
 
             const res = JSON.parse(message.data)
             // console.log(res)
@@ -264,7 +307,14 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
                 setId(res.profileId)
             }
 
+            if(res.type === "hung_up"){
+                room?.disconnect()
+                setDisconnect(true)
+
+            }
+
             if(res.type === "init_call"){
+                setRoomId(res.roomId)
                 const callingProfile = chatList.find((chat : any)=>{
                     if(chat.id === res.profileId){
                         return chat;
@@ -299,22 +349,49 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
 
             if(res.type === "callEnded"){
                 setIncommingCall(false)
+
             }
 
 
-            if(res.type ==="connected"){
-                console.log("connected")
+            if(res.type ==="connected" && pc){
+                // console.log("connected")
                 setConnected(true)
                 setIncommingCall(false)
                 setInitCall(false)
                 setCallVisiblity(false)
-                // setInitCall(true)/
+                
+
+                
             }
+
+
+            // if(pc){
+            
+                
+                
+            // if (res.type === 'iceCandidate') {
+            //     // console.log("recevier candidates :")
+            //     // console.log(res.candidate)
+                
+            //     pc.addIceCandidate(res.candidate).then((res)=>{
+            //         console.log("ICE added")
+            //     })
+            // }
+          
+           
+            //   console.log("creating answer")
+
+            
+
+            
+
+            // }
+
+
 
             if(res.type === "disconnected"){
                 setConnected(false)
             }
-
         }
     }
 
@@ -365,6 +442,29 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     },[currentChat.chats , currentChat])
 
 
+    useEffect(()=>{
+        const audioTrack = localStream?.getAudioTracks()[0]
+        if(!audioTrack){
+          return
+        }
+    
+    
+        if(audioTrack.enabled){
+          audioTrack.enabled = false
+          setMicStatus(false)
+        } else {
+          audioTrack.enabled = true
+          setMicStatus(true)
+        }
+    },[mute])
+    const onConnected = async () => {
+        const audioTrack = await createLocalAudioTrack({
+          echoCancellation: true,
+          noiseSuppression: true,
+        });
+        room?.localParticipant.publishTrack(audioTrack);
+      };
+
     function handleChange(e: any){
         setInput(e.target.value)
         const typeObj = {
@@ -379,7 +479,6 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     function newPC(){
         const pc = new RTCPeerConnection()
         setPC(pc)
-        // startReceiving()
     }
 
 
@@ -401,7 +500,6 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
     }
 
     if(initCall &&socket){
-        socket.send(JSON.stringify({type : "init_call" , profileId : currentProfileCall.profileId}))
     }
 
     if(callEnded && socket){
@@ -416,12 +514,16 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
         setDisconnect(false)
     }
 
+    
+    
+
     return (
+        <>
         <div className='grid grid-cols-9 h-screen w-screen p-6'>
       <DmList res = {response} id={id} chatList={chatList} loggedInUserSession={loggedInUserSession}/>
-      {incommingCall ? <IncommingCall comein={true}/> : connected ? <Connected/> : <div className="hidden"></div>}
+      {incommingCall ? <IncommingCall comein={true}/> : connected ? <Connected room={room}/> : <div className="hidden"></div>}
       
-      {CallVisiblity ? <Calling comein={true}/> : connected ? <Connected/> : <div className="hidden"></div>}
+      {CallVisiblity ? <Calling comein={true}/> : connected ? <Connected room={room}/> : <div className="hidden"></div>}
         {settings ? <AccSettings comein={true} /> : <AccSettings  comein={false}/>}
       {currentChat.profileId?
       <div style={{height: "100%" , width: "100%"}} className={profileInfoView? 'col-span-4 bg-slate-900 rounded-r-sm ease-in-out duration-500' : 'col-span-6 bg-slate-900 rounded-r-sm ease-in-out duration-500'}>
@@ -461,6 +563,34 @@ export const ChatPage = ( { chatList , loggedInUserSession } : any)=>{
               <img style={{width : "43rem" , height : "48rem"}} src={currentChat.profilePic} alt="" />
             </Modal.Body>
           </Modal>
+          
     </div>
+    <LiveKitRoom
+            video={true}
+            audio={true}
+            token={token}
+            serverUrl={serverUrl}
+            room={room}
+            onConnected={onConnected}
+            onDisconnected={()=>{
+                setToken("")
+                setRoom(undefined)
+                setRoomId("")
+            }}
+            // Use the default LiveKit theme for nice styles.
+            data-lk-theme="default"
+            style={{ height: '100vh', position : "absolute" }}
+            
+          >
+            {/* Your custom component with basic video conferencing functionality. */}
+            {/* <MyVideoConference /> */}
+            {/* The RoomAudioRenderer takes care of room-wide audio for you. */}
+            <RoomAudioRenderer />
+            {/* Controls for the user to start/stop audio, video, and screen
+            share tracks and to leave the room. */}
+            {/* <ControlBar /> */}
+          </LiveKitRoom>
+    </>
+
     )
 }

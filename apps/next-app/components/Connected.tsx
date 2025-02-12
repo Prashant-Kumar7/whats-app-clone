@@ -1,22 +1,55 @@
 "use client"
 
-import { backToCallAtom, connectedAtom, currentProfileCallAtom, disconnectAtom, micStatusAtom } from "@/state"
+import { backToCallAtom, connectedAtom, currentProfileCallAtom, disconnectAtom, micClickedAtom, micStatusAtom, muteAtom } from "@/state"
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil"
+import { Track , Room, RoomEvent,} from 'livekit-client';
+import { useEffect, useState } from "react";
 
-export const Connected = ()=>{
+
+interface RoomProp {
+  room : Room | undefined
+}
+
+
+export const Connected = ({room} :RoomProp)=>{
     const [backToCall, setBackToCall] = useRecoilState(backToCallAtom)
     const currentProfileCall = useRecoilValue(currentProfileCallAtom)
     const micStatus = useRecoilValue(micStatusAtom);
     const setConnected = useSetRecoilState(connectedAtom)
     const setDisconnect = useSetRecoilState(disconnectAtom)
+    const setMicClicked = useSetRecoilState(micClickedAtom)
+    const [mute, setMute] = useRecoilState(muteAtom)
+    const [micToggle , setMicToggle] = useState(true)
+
+
+    useEffect(()=>{
+      return ()=>{
+        setMute(false)
+      }
+    },[])
+
+
+    useEffect(()=>{
+      const localParticipant = room?.localParticipant;
+      localParticipant?.setMicrophoneEnabled(!mute)
+    },[mute])
+
+
+
 
     function handleBack(){
         setBackToCall(false)
     }
+    
+    
 
-    function handleHangUp(){
-        setDisconnect(true)
-    }
+    const handleHangup = () => {
+      if (room) {
+        room.disconnect();
+      }
+      setDisconnect(true)
+
+    };
 
     return (
         <div style={{width : "34.55rem", height : "94.5%" , right : "98.66%"}} className={backToCall? "p-6  absolute  opacity-1 ease-in-out translate-x-full duration-300 bg-slate-900" : "p-6 absolute  opacity-0 ease-in-out duration-300 -translate-x-full bg-slate-900" }>
@@ -33,7 +66,7 @@ export const Connected = ()=>{
                 </div>
 
                 <div className="flex justify-evenly">
-                    <svg onClick={handleHangUp}
+                    <svg onClick={handleHangup}
                         xmlns="http://www.w3.org/2000/svg"
                         width="70"
                         height="70"
@@ -53,9 +86,7 @@ export const Connected = ()=>{
                         </g>
                     </svg>
                     {micStatus ? <MicOn/> : <MicOff/>}
-                    
-
-
+                    {mute? <Mute/> : <Unmute/> }
                 </div>
             </div>
         </div>
@@ -65,11 +96,18 @@ export const Connected = ()=>{
 
 
 const MicOn = ()=>{
+    const setMicClicked = useSetRecoilState(micClickedAtom)
 
-    const setMicStatus = useSetRecoilState(micStatusAtom)
+
+
+    function handleMicToggle(){
+      setMicClicked((prev)=>{
+        return !prev
+      })
+    }
 
     return (
-        <svg onClick={()=>setMicStatus(false)}
+        <svg onClick={handleMicToggle}
           xmlns="http://www.w3.org/2000/svg"
           width="70"
           height="70"
@@ -89,11 +127,17 @@ const MicOn = ()=>{
 
 const MicOff = ()=>{
 
-    const setMicStatus = useSetRecoilState(micStatusAtom)
+    const setMicClicked = useSetRecoilState(micClickedAtom)
 
+
+    function handleMicToggle(){
+      setMicClicked((prev)=>{
+        return !prev
+      })
+    }
 
     return (
-        <svg onClick={()=>setMicStatus(true)}
+        <svg onClick={handleMicToggle}
           xmlns="http://www.w3.org/2000/svg"
           width="70"
           height="70"
@@ -111,4 +155,51 @@ const MicOff = ()=>{
           </g>
         </svg>
     )
+}
+
+const Mute = ()=>{
+
+  const setMute = useSetRecoilState(muteAtom)
+
+  return (
+    <svg onClick={()=>setMute(false)}
+      xmlns="http://www.w3.org/2000/svg"
+      width="70"
+      height="70"
+      viewBox="0 0 256 256"
+    >
+      <g fill="#000" strokeMiterlimit="10" strokeWidth="1">
+        <path
+          d="M71.322 59.853a2 2 0 01-2-2V6.568L45.154 28.88c-.369.341-.854.53-1.356.53h-5.752a2 2 0 010-4h4.969L69.966.53a2.003 2.003 0 012.158-.362A1.998 1.998 0 0173.323 2v55.853a2 2 0 01-2.001 2zM84.71 81.303L8.003 10.487a2 2 0 10-2.714 2.939L18.271 25.41h-4.715a2 2 0 00-2 2v35.18a2 2 0 002 2h29.459l26.951 24.88a1.997 1.997 0 002.158.362A1.998 1.998 0 0073.322 88V76.234l8.675 8.009a1.998 1.998 0 002.826-.114 1.999 1.999 0 00-.113-2.826zm-15.388 2.129L45.153 61.12a1.999 1.999 0 00-1.356-.53H15.555V29.411h7.048l46.719 43.131v10.89z"
+          transform="matrix(2.81 0 0 2.81 1.407 1.407)"
+        ></path>
+      </g>
+    </svg>
+  )
+}
+
+const Unmute = ()=>{
+
+  const setMute = useSetRecoilState(muteAtom)
+
+
+  return (
+    <svg  onClick={()=>setMute(true)}
+      xmlns="http://www.w3.org/2000/svg"
+      width="70"
+      height="70"
+      viewBox="0 0 256 256"
+    >
+      <g fill="#64748B" strokeMiterlimit="10" strokeWidth="1">
+        <path
+          d="M64.293 90c-.493 0-.979-.183-1.356-.53L35.986 64.59H6.526a2 2 0 01-2-2V27.41a2 2 0 012-2h29.46L62.937.53A1.998 1.998 0 0166.293 2v86a2 2 0 01-2 2zM76.42 73.908a2 2 0 01-1.504-3.316C78.9 66.037 81.474 55.991 81.474 45S78.9 23.963 74.915 19.408a2 2 0 113.011-2.634c4.655 5.323 7.547 16.138 7.547 28.225s-2.892 22.903-7.547 28.225a1.99 1.99 0 01-1.506.684z"
+          transform="matrix(2.81 0 0 2.81 1.407 1.407)"
+        ></path>
+        <path
+          d="M72.02 62.623a2 2 0 01-1.757-2.951c1.851-3.421 2.955-8.906 2.955-14.672 0-5.765-1.104-11.25-2.955-14.672a2 2 0 013.518-1.903c2.185 4.039 3.438 10.08 3.438 16.575 0 6.495-1.253 12.536-3.438 16.574a2 2 0 01-1.761 1.049z"
+          transform="matrix(2.81 0 0 2.81 1.407 1.407)"
+        ></path>
+      </g>
+    </svg>
+  )
 }
